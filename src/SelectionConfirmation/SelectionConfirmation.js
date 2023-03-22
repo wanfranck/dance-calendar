@@ -1,29 +1,25 @@
 import './SelectionConfirmation.css';
 
 import { 
-  Button,
   Box,
+  Button,
   ButtonGroup,
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  PopoverHeader,
-  PopoverBody,
-  PopoverFooter,
-  PopoverArrow,
-  PopoverCloseButton,
-  PopoverAnchor,
 } from '@chakra-ui/react';
 
-
+import { BiShowAlt } from 'react-icons/bi';
+import { AiOutlineClose } from 'react-icons/ai';
 
 function SelectionConfirmation({ position, onConfirm, onClose }) {
     const style = position ? {top: position[1], left: position[0]} : {};
     return (
-      <Box className={`SelectionConfirmation ${ position ? '' : 'Hidden' }`} style={style}>
-        <ButtonGroup>
-          <Button colorScheme='blue' size='xs' onClick={() => onConfirm()}> Show </Button>
-          <Button colorScheme='blue' size='xs' onClick={() => onClose()}> X </Button>
+      <Box borderWidth='1px' borderRadius='lg' padding='1px' className={`SelectionConfirmation ${ position ? '' : 'Hidden' }`} style={style}>
+        <ButtonGroup justifyContent={'left'} gap='1px'>
+          <Button size='xs' onClick={() => onConfirm()}>
+            <BiShowAlt height='100%' />
+          </Button>
+          <Button size='xs' onClick={() => onClose()}>
+            <AiOutlineClose height='100%' />
+          </Button>
         </ButtonGroup>
       </Box>
     );

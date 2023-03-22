@@ -8,11 +8,11 @@ import './Map.css';
 function sourceFromEvents(events) {
     return {
         'type': 'FeatureCollection',
-        'features': events.map(event => ({ type: 'Feature', geometry: { type: 'Point', coordinates: event.coordinates } }))
+        'features': events.map(event => ({ type: 'Feature', properties: event, geometry: { type: 'Point', coordinates: event.coordinates } }))
     };
 }
 
-function Map({ events, isActive }) {
+function Map({ events, isActive, onEventClick }) {
     const map = useRef(null);
 
     useEffect(() => {
@@ -40,6 +40,11 @@ function Map({ events, isActive }) {
                     'circle-radius': 6,
                     'circle-color': '#B42222'
                 },
+            });
+
+            map.current.on('click', 'events', (e) => {
+                console.log(e);
+                onEventClick(e.originalEvent);
             });
         });
     });

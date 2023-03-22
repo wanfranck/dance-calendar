@@ -31,12 +31,14 @@ function PopupContent({ events }) {
   
   return (
     <div style={style}>
-      <div className="NavigationBar">
-        <ViewController views={[ViewMode.List, ViewMode.Map]} setViewMode={(mode) => setMode(mode)} />
-      </div>
       <div className='Container'>
-        <List events={events} isActive={mode === ViewMode.List} />
-        <Map events={events} isActive={mode === ViewMode.Map} />
+        <div className="NavigationBar">
+          <ViewController views={[ViewMode.List, ViewMode.Map]} setViewMode={(mode) => setMode(mode)} />
+        </div>
+        <div className='Container'>
+          <List events={events} isActive={mode === ViewMode.List} />
+          <Map events={events} isActive={mode === ViewMode.Map} />
+        </div>
       </div>
     </div>
   );
@@ -72,8 +74,8 @@ function App() {
     setPopupContent(null);
   }
 
-  function onStopSelection(event, element) {
-    setPopupPosition([event.pageX, event.pageY, element]);
+  function onStopSelection(event) {
+    setPopupPosition([event.pageX, event.pageY]);
   }
 
   function onClose() {
@@ -138,17 +140,14 @@ function App() {
 
       <Popup content={popupContent} isShow={showSelection} onClose={() => setShowSelection(false)} />
       <SelectionConfirmation position={popupPosition} onConfirm={onConfirm} onClose={onClose} />
-      <div className='Container Big'>
-        <Calendar date={date} 
-                  events={events} 
-                  onSelection={onSelection} 
-                  onStopSelection={onStopSelection} 
-                  onStartSelection={closePopup}
-                  renderCell={renderDay}
-                  renderHeader={renderHeader}
+      <div className='Container'>
+        <Calendar events={events} date={date} 
+                  onStopSelection={onStopSelection} onStartSelection={closePopup}
+                  onSelection={onSelection}
+                  renderHeader={renderHeader} renderCell={renderDay}
                   isActive={mode === ViewMode.Calendar} />
         <List events={getEventsAfter(events, date)} isActive={mode === ViewMode.List} />
-        <Map events={events} isActive={mode === ViewMode.Map} />
+        <Map events={events} onEventClick={onStopSelection}isActive={mode === ViewMode.Map} />
       </div>
 
     </div>

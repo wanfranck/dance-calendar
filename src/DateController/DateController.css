@@ -1,0 +1,11 @@
+.DateController {
+    gap: 2px;
+}
+
+.CurrentMonth {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 10vw;
+    color: white;
+}

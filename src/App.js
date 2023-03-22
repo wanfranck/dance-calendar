@@ -1,23 +1,156 @@
-import logo from './logo.svg';
+import React, { useEffect, useState } from 'react';
+import { format } from 'date-fns';
+
 import './App.css';
 
+import Calendar from './Calendar';
+import List from './List';
+import Popup from './Popup';
+import SelectionConfirmation from './SelectionConfirmation';
+import Map from './Map';
+
+import ViewController, { ViewMode } from './ViewController';
+import DateController from './DateController';
+
+import { isEventInDay, getEventsAfter } from './Utils/EventUtils';
+import getEvents from './Events/Events';
+
+import { AiTwotoneFilter } from 'react-icons/ai';
+import { Tag, Button, Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverHeader,
+  PopoverBody,
+  PopoverArrow,
+  PopoverCloseButton } from '@chakra-ui/react';
+
+function PopupContent({ events }) {
+  const style = { borderRadius: '4px', backgroundColor: 'white', margin: 'auto', width: '60%', height: '60%' };
+  
+  const [mode, setMode] = useState(ViewMode.List);
+  
+  return (
+    <div style={style}>
+      <div className="NavigationBar">
+        <ViewController views={[ViewMode.List, ViewMode.Map]} setViewMode={(mode) => setMode(mode)} />
+      </div>
+      <div className='Container'>
+        <List events={events} isActive={mode === ViewMode.List} />
+        <Map events={events} isActive={mode === ViewMode.Map} />
+      </div>
+    </div>
+  );
+}
+
 function App() {
+  const [events, setEvents] = useState([]);
+  const [date, setDate] = useState(new Date());
+  const [popupContent, setPopupContent] = useState(null);
+  const [showSelection, setShowSelection] = useState(false);
+  const [popupPosition, setPopupPosition] = useState(null);
+  const [mode, setMode] = useState(ViewMode.Calendar);
+
+  useEffect(() => {
+    async function loadEvents() {
+      console.log("Getting events...");
+      const events = await getEvents();
+      console.log("Finished.");
+      console.log("Events: ", events);
+      setEvents(events);
+    }
+
+    loadEvents();
+  }, []);
+
+  function onSelection(items) {
+    setPopupContent(
+      <PopupContent events={items} />
+    );
+  }
+
+  function closePopup() {
+    setPopupContent(null);
+  }
+
+  function onStopSelection(event, element) {
+    setPopupPosition([event.pageX, event.pageY, element]);
+  }
+
+  function onClose() {
+    setPopupPosition(null);
+  }
+
+  function onConfirm() {
+      setShowSelection(true);
+      setPopupPosition(null);
+  }
+
+  function renderDay(dayDate, index) {
+    const dayEvents = events.filter(event => isEventInDay(event, dayDate));
+    const tags = Array.from(dayEvents
+      .map(e => e.tags)
+      .flat()
+      .reduce((tags, tag) => {
+        tags.add(tag);
+        return tags;
+    }, new Set()));
+
+    return (
+      <div style={{ display: 'block', width: '100%', height: '100%' }} key={`day-cell-content-${index}`}>
+        <p>{ format(dayDate, "MMM do") }</p>
+        { dayEvents.length ? <p>{ "events: " + dayEvents.length }</p> : <p /> }
+        <div style={{ display: 'inline-block', height: '50%', overflow: 'scroll' }}>
+          { tags.map((t, idx) => (<Tag margin={'3px'} key={`tag-${idx}`} float='left' size='xs' fontSize={'xs'}>{ t }</Tag>)) }
+        </div>
+      </div>
+    );
+  }
+
+  function renderHeader(item, index) {
+      return (
+        <div key={`header-cell-content-${index}`}>
+          {item}
+        </div>
+      );
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+
+      <div className="NavigationBar">
+        <DateController onSetDate={(date) => setDate(date)} />
+        <ViewController views={[ViewMode.Calendar, ViewMode.List, ViewMode.Map]} setViewMode={(mode) => setMode(mode)} />
+        <Popover>
+          <PopoverTrigger>
+            <Button colorScheme='blue' style={{ height: '90%' }}>
+              <AiTwotoneFilter width='100%' height='100%' />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent>
+            <PopoverArrow />
+            <PopoverCloseButton />
+            <PopoverHeader>Confirmation!</PopoverHeader>
+            <PopoverBody>Are you sure you want to have that milkshake?</PopoverBody>
+          </PopoverContent>
+        </Popover>
+      </div>
+        
+
+      <Popup content={popupContent} isShow={showSelection} onClose={() => setShowSelection(false)} />
+      <SelectionConfirmation position={popupPosition} onConfirm={onConfirm} onClose={onClose} />
+      <div className='Container Big'>
+        <Calendar date={date} 
+                  events={events} 
+                  onSelection={onSelection} 
+                  onStopSelection={onStopSelection} 
+                  onStartSelection={closePopup}
+                  renderCell={renderDay}
+                  renderHeader={renderHeader}
+                  isActive={mode === ViewMode.Calendar} />
+        <List events={getEventsAfter(events, date)} isActive={mode === ViewMode.List} />
+        <Map events={events} isActive={mode === ViewMode.Map} />
+      </div>
+
     </div>
   );
 }

@@ -6,16 +6,16 @@ import {
   ButtonGroup,
 } from '@chakra-ui/react';
 
-import { BiShowAlt } from 'react-icons/bi';
+import { HiMagnifyingGlass } from 'react-icons/hi2';
 import { AiOutlineClose } from 'react-icons/ai';
 
-function SelectionConfirmation({ position, onConfirm, onClose }) {
-    const style = position ? {top: position[1], left: position[0]} : {};
+function SelectionConfirmation({ position, selection, onConfirm, onClose }) {
+    const style = position && selection.length ? {top: position[1], left: position[0]} : {};
     return (
       <Box borderWidth='1px' borderRadius='lg' padding='1px' className={`SelectionConfirmation ${ position ? '' : 'Hidden' }`} style={style}>
         <ButtonGroup justifyContent={'left'} gap='1px'>
           <Button size='xs' onClick={() => onConfirm()}>
-            <BiShowAlt height='100%' />
+            <HiMagnifyingGlass height='100%' />
           </Button>
           <Button size='xs' onClick={() => onClose()}>
             <AiOutlineClose height='100%' />

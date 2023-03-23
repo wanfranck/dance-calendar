@@ -31,7 +31,6 @@ function PopupContent({ events }) {
   
   return (
     <div style={style}>
-      <div className='Container'>
         <div className="NavigationBar">
           <ViewController views={[ViewMode.List, ViewMode.Map]} setViewMode={(mode) => setMode(mode)} />
         </div>
@@ -39,7 +38,6 @@ function PopupContent({ events }) {
           <List events={events} isActive={mode === ViewMode.List} />
           <Map events={events} isActive={mode === ViewMode.Map} />
         </div>
-      </div>
     </div>
   );
 }
@@ -47,7 +45,7 @@ function PopupContent({ events }) {
 function App() {
   const [events, setEvents] = useState([]);
   const [date, setDate] = useState(new Date());
-  const [popupContent, setPopupContent] = useState(null);
+  const [popupItems, setPopupItems] = useState([]);
   const [showSelection, setShowSelection] = useState(false);
   const [popupPosition, setPopupPosition] = useState(null);
   const [mode, setMode] = useState(ViewMode.Calendar);
@@ -65,13 +63,11 @@ function App() {
   }, []);
 
   function onSelection(items) {
-    setPopupContent(
-      <PopupContent events={items} />
-    );
+    setPopupItems(items);
   }
 
   function closePopup() {
-    setPopupContent(null);
+    setPopupItems([]);
   }
 
   function onStopSelection(event) {
@@ -102,7 +98,7 @@ function App() {
         <p>{ format(dayDate, "MMM do") }</p>
         { dayEvents.length ? <p>{ "events: " + dayEvents.length }</p> : <p /> }
         <div style={{ display: 'inline-block', height: '50%', overflow: 'scroll' }}>
-          { tags.map((t, idx) => (<Tag margin={'3px'} key={`tag-${idx}`} float='left' size='xs' fontSize={'xs'}>{ t }</Tag>)) }
+          { tags.map((t, idx) => (<Tag colorScheme='blackAlpha' variant='outline' size='sm' margin={'3px'} key={`tag-${idx}`} float='left'>{ t }</Tag>)) }
         </div>
       </div>
     );
@@ -110,7 +106,7 @@ function App() {
 
   function renderHeader(item, index) {
       return (
-        <div key={`header-cell-content-${index}`}>
+        <div style={{color: 'navy'}} key={`header-cell-content-${index}`}>
           {item}
         </div>
       );
@@ -138,15 +134,15 @@ function App() {
       </div>
         
 
-      <Popup content={popupContent} isShow={showSelection} onClose={() => setShowSelection(false)} />
-      <SelectionConfirmation position={popupPosition} onConfirm={onConfirm} onClose={onClose} />
+      <Popup content={popupItems ? <PopupContent events={popupItems} /> : null} isShow={showSelection} onClose={() => setShowSelection(false)} />
+      <SelectionConfirmation position={popupPosition} selection={popupItems} onConfirm={onConfirm} onClose={onClose} />
       <div className='Container'>
         <Calendar events={events} date={date} 
                   onStopSelection={onStopSelection} onStartSelection={closePopup}
                   onSelection={onSelection}
                   renderHeader={renderHeader} renderCell={renderDay}
                   isActive={mode === ViewMode.Calendar} />
-        <List events={getEventsAfter(events, date)} isActive={mode === ViewMode.List} />
+        <List events={events} isActive={mode === ViewMode.List} />
         <Map events={events} onEventClick={onStopSelection}isActive={mode === ViewMode.Map} />
       </div>
 

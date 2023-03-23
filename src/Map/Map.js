@@ -43,7 +43,7 @@ function Map({ events, isActive, onEventClick }) {
             });
 
             map.current.on('click', 'events', (e) => {
-                console.log(e);
+                console.log(e, e.features);
                 onEventClick(e.originalEvent);
             });
         });

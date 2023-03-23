@@ -87,7 +87,7 @@ function Calendar({ date, events, renderCell, renderHeader, onSelection, onStopS
         const currentDayClass = isCurrentDay(dayDate) ? "Current": "";
         const notThisMonthClass = dayDate.getMonth() !== date.getMonth() ? "Disabled" : "";
         const inSelection = selection.indexOf(index) !== -1 ? "Selected" : "";
-        const dayClass = `Item Cell ${currentDayClass} ${notThisMonthClass} ${inSelection}`;
+        const dayClass = `Item Cell ${notThisMonthClass} ${inSelection} ${currentDayClass}`;
 
         return (
             <Td className={dayClass}

@@ -5,20 +5,25 @@
 }
 
 .Cell {
-    background-color: white;
     border-style: solid;
     border-width: 1px;
+    background-color: white;
 }
 
 .Disabled {
-    background-color: #9b9b9b;
+    background-color: rgba(128, 128, 128, 0.5);
     color: white;
 }
-  
+
+.Current { 
+    background-color: rgba(128, 128, 128, 0.25);
+}
+
 .Selected {
     background-color: #248BD6;
     color: white;
 }
-  
-.Current {}
-.Header {}
+
+.Header {
+    color: yellow;
+}

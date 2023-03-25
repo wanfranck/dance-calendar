@@ -12,7 +12,7 @@ function sourceFromEvents(events) {
     };
 }
 
-function Map({ events, isActive, onEventClick }) {
+function Map({ events, isActive, onEventClick, prefix }) {
     const map = useRef(null);
 
     useEffect(() => {
@@ -20,7 +20,7 @@ function Map({ events, isActive, onEventClick }) {
 
         mapboxgl.accessToken = 'pk.eyJ1IjoiYW50b24tbGFzaGNoYW5rYSIsImEiOiJjbGY1anhha3MwbGpoM3lxaGZmaHM4dWliIn0.JyEoFVACqTIpRpTZzSIFvg';
         map.current = new mapboxgl.Map({
-            container: 'map',
+            container: `map-${prefix}`,
             style: 'mapbox://styles/mapbox/streets-v12',
             center: [-74.5, 40],
             zoom: 9,
@@ -66,7 +66,7 @@ function Map({ events, isActive, onEventClick }) {
     }, [events, isActive]);
 
     return (
-        <div className={`Map ${isActive ? '' : 'Hidden'}`} id='map' />
+        <div className={`Map ${isActive ? '' : 'Hidden'}`} id={`map-${prefix}`} />
     );
 }
 

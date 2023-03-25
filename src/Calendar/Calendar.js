@@ -7,13 +7,13 @@ import { isCurrentDay, getCalendarDays } from '../Utils/TimeUtils';
 import { getEventsForSelection } from '../Utils/EventUtils';
 
 import {
+    TableContainer,
     Table,
     Thead,
     Tbody,
     Tr,
     Th,
     Td,
-    TableContainer,
   } from '@chakra-ui/react'
 
 const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -94,7 +94,8 @@ function Calendar({ date, events, renderCell, renderHeader, onSelection, onStopS
                 key={`cell-${index}`} 
                 onContextMenu={(event) => onMouseAction(event, index)}
                 onMouseMove={(event) => onMouseAction(event, index)}
-                onMouseUp={(event) => onMouseAction(event, index)}>
+                onMouseUp={(event) => onMouseAction(event, index)}
+                onClick={(e) => console.log(e)}>
                     {renderCell(dayDate, index)}
             </Td>
         );

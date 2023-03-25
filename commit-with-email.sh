@@ -1,1 +1,0 @@
-git commit --author="Anton Lashchanka <anton.lashchanka@gmail.com>" $@

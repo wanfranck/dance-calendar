@@ -6,9 +6,10 @@ import {
     AccordionButton,
     AccordionPanel,
     AccordionIcon,
-    Box,
-    Tag
+    Box
 } from '@chakra-ui/react'
+
+import Tag from '../Tag';
 
 function List({ events, isActive }) {
     return (
@@ -23,10 +24,7 @@ function List({ events, isActive }) {
                                     <div style={{ height: '100%', display:'flex', flexDirection:'column', justifyContent: 'space-between'}}>
                                         <p> {item.title} <b>{item.date}</b> </p>
                                         <div>
-                                            { item.tags.map((t, idx) => (
-                                                <Tag key={`tag-${idx}`} colorScheme='blackAlpha' variant='outline' size='sm' margin={'3px'} float='left'>
-                                                    { t }
-                                                </Tag>)) 
+                                            { item.tags.map((t, idx) => <Tag key={`tag-${idx}`} value={t} />) 
                                             }
                                         </div>
                                     </div>

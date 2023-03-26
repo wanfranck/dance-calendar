@@ -10,7 +10,7 @@ import { HiMagnifyingGlass } from 'react-icons/hi2';
 import { AiOutlineClose } from 'react-icons/ai';
 
 function SelectionConfirmation({ position, selection, onConfirm, onClose }) {
-    const style = position && selection.length ? {top: position[1], left: position[0]} : {};
+    const style = position && selection.length ? {top: position[1], left: position[0]} : {display: 'none'};
     return (
       <Box borderWidth='1px' borderRadius='lg' padding='1px' className={`SelectionConfirmation ${ position ? '' : 'Hidden' }`} style={style}>
         <ButtonGroup justifyContent={'left'} gap='1px'>

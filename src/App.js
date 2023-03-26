@@ -77,7 +77,8 @@ function App() {
   }
 
   function onStopSelection(event) {
-    setPopupPosition([event.pageX, event.pageY]);
+    setPopupPosition(['87%', '82%']);
+    // setPopupPosition([event.pageX, event.pageY]);
   }
 
   function onClose() {

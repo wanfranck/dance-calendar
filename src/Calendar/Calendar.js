@@ -75,9 +75,10 @@ function Calendar({ date, events, renderCell, renderHeader, onSelection, onStopS
         return resultArray
     }, []);;
 
+    const rowPercent = 100. / Math.floor(cells.length / 7);
     const rows = weeksCells.map((cells, weekIndex) => {
         return (
-            <Tr width='100%'  key={`row-${weekIndex}`}>
+            <Tr width='100%' height={`${rowPercent}%`} key={`row-${weekIndex}`}>
                 { cells }
             </Tr>
         );
@@ -91,7 +92,8 @@ function Calendar({ date, events, renderCell, renderHeader, onSelection, onStopS
 
         return (
             <Td className={dayClass}
-                key={`cell-${index}`} 
+                key={`cell-${index}`}
+                width='14%'
                 onContextMenu={(event) => onMouseAction(event, index)}
                 onMouseMove={(event) => onMouseAction(event, index)}
                 onMouseUp={(event) => onMouseAction(event, index)}
@@ -126,12 +128,12 @@ function Calendar({ date, events, renderCell, renderHeader, onSelection, onStopS
                    onContextMenu={(event) => onStartCollecting(event)}
                    onMouseDown={(event) => onStartCollecting(event)}
                    onMouseUp={(event) => onStopCollecting(event)} >
-                <Thead width='100%'>
-                    <Tr width ='100%' >
+                <Thead width='100%' height='5%'>
+                    <Tr width ='100%' height='100%'>
                         {daysOfWeek.map((item, index) => renderHeaderCell(item, index))}
                     </Tr>
                 </Thead>
-                <Tbody width='100%'>
+                <Tbody width='100%' height='95%'>
                     {rows}
                 </Tbody>
             </Table>

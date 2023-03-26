@@ -9,6 +9,7 @@ import Popup from './Popup';
 import SelectionConfirmation from './SelectionConfirmation';
 import Map from './Map';
 import Tag from './Tag';
+import FilterControl from './FilterControl';
 
 import ViewController, { ViewMode } from './ViewController';
 import DateController from './DateController';
@@ -16,19 +17,8 @@ import DateController from './DateController';
 import { isEventInDay } from './Utils/EventUtils';
 import getEvents from './Events/Events';
 
-import { AiTwotoneFilter, AiOutlineClose, AiOutlineClear } from 'react-icons/ai';
-import { Button, Popover,
-  PopoverTrigger,
-  PopoverContent,
-  PopoverHeader,
-  PopoverBody,
-  PopoverArrow,
-  PopoverCloseButton, Input,
-  RangeSlider,
-  RangeSliderTrack,
-  RangeSliderFilledTrack,
-  RangeSliderThumb, } from '@chakra-ui/react';
-
+import { AiOutlineClose, AiOutlineClear } from 'react-icons/ai';
+import { Button } from '@chakra-ui/react';
 
 function PopupContent({ events, onClose }) {
   const style = { borderRadius: '4px', backgroundColor: 'white', margin: 'auto', width: '60%', height: '60%' };
@@ -52,12 +42,15 @@ function PopupContent({ events, onClose }) {
 }
 
 function App() {
+  const [allEvents, setAllEvents] = useState([]);
   const [events, setEvents] = useState([]);
   const [date, setDate] = useState(new Date());
   const [popupItems, setPopupItems] = useState([]);
   const [showSelection, setShowSelection] = useState(false);
   const [popupPosition, setPopupPosition] = useState(null);
   const [mode, setMode] = useState(ViewMode.Calendar);
+  const [tagsFilter, setTagsFilter] = useState([]);
+  const [chosenTags, setChosenTags] = useState([]);
 
   useEffect(() => {
     async function loadEvents() {
@@ -65,7 +58,11 @@ function App() {
       const events = await getEvents();
       console.log("Finished.");
       console.log("Events: ", events);
+      setAllEvents(events);
       setEvents(events);
+      const allTags = events.reduce((acc, ev) => new Set([...new Set(ev.tags), ...acc]), new Set());
+      setTagsFilter([...allTags]);
+      setChosenTags([]);
     }
 
     loadEvents();
@@ -92,6 +89,16 @@ function App() {
       setPopupPosition(null);
   }
 
+  function onSetTagFilter(tag) {
+    const newChosenTags = [...new Set(
+      [...chosenTags.filter(t => [tag].indexOf(t) === -1), 
+       ...[tag].filter(t => chosenTags.indexOf(t) === -1)]
+    )];
+    setChosenTags(newChosenTags);
+    console.log(newChosenTags);
+    setEvents(newChosenTags.length ? allEvents.filter(event => event.tags.some(tag => newChosenTags.indexOf(tag) !== -1)) : allEvents);
+  }
+
   function renderDay(dayDate, index) {
     const dayEvents = events.filter(event => isEventInDay(event, dayDate));
     const tags = Array.from(dayEvents
@@ -107,7 +114,7 @@ function App() {
         <p>{ format(dayDate, "MMM do") }</p>
         { dayEvents.length ? <p>{ "events: " + dayEvents.length }</p> : <p /> }
         <div style={{ display: 'inline-block', height: '50%', overflow: 'scroll' }}>
-          { tags.map((t, idx) => <Tag key={`tag-${idx}`} value={t} />) }
+          { tags.map((t, idx) => <Tag key={`tag-${idx}`} value={t} isActive={chosenTags.indexOf(t) !== -1} onClick={tagValue => onSetTagFilter(tagValue)} />) }
         </div>
       </div>
     );
@@ -123,47 +130,17 @@ function App() {
 
   return (
     <div className="App">
-
       <div className="NavigationBar">
         <div style={{display:'flex'}}>
-          <DateController onSetDate={(date) => setDate(date)} />
+          <DateController date={date} onSetDate={(date) => setDate(date)} />
           <ViewController views={[ViewMode.Calendar, ViewMode.List, ViewMode.Map]} setViewMode={(mode) => setMode(mode)} />
-          <Popover>
-            <PopoverTrigger>
-              <Button colorScheme='blue' style={{ height: '90%' }}>
-                <AiTwotoneFilter width='100%' height='100%' />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent>
-              <PopoverArrow />
-              <PopoverCloseButton />
-              <PopoverHeader>What events are you looking for? <br/> The one that...</PopoverHeader>
-              <PopoverBody>
-                <div>
-                  <div>
-                    <p>Starting from: </p>
-                    <Input placeholder="Select Date and Time" size="md" type="datetime-local" />
-                  </div>
-
-                  <div>
-                    <p>Will cost between: </p>
-                    <RangeSlider aria-label={['min', 'max']} defaultValue={[10, 30]}>
-                      <RangeSliderTrack>
-                        <RangeSliderFilledTrack />
-                      </RangeSliderTrack>
-                      <RangeSliderThumb index={0} />
-                      <RangeSliderThumb index={1} />
-                    </RangeSlider>
-                  </div>
-
-                  <div>
-                    <p>Related to: </p>
-                    {['category1', 'category2', 'category3', 'category4', 'category5', 'category6'].map((c, idx) => <Tag key={`tag-${idx}`} value={c} />)}
-                  </div>
-                </div>
-              </PopoverBody>
-            </PopoverContent>
-          </Popover>
+          <FilterControl date={date} 
+                         tags={
+                          tagsFilter.map((tag) => 
+                            ({ value: tag, isActive: chosenTags.indexOf(tag) !== -1}))
+                         } 
+                         onChangeDate={d => setDate(d)} 
+                         onChangeFilter={tag => onSetTagFilter(tag)} />
         </div>
         
         <Button colorScheme='blue' style={{ height: '90%' }}>

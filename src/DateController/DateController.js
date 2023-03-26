@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { add, sub } from 'date-fns';
 
 import { useHasChanged } from "../Utils/ReactUtils";
@@ -9,8 +9,7 @@ import { Button } from "@chakra-ui/react";
 
 import './DateController.css';
 
-function DateController({ onSetDate }) {
-    const [date, setDate] = useState(new Date());
+function DateController({ date, onSetDate }) {
     const isDateChanged = useHasChanged(date);
 
     useEffect(() => {
@@ -20,11 +19,11 @@ function DateController({ onSetDate }) {
     });
 
     function onPrev() {
-        setDate(sub(date, { months: 1 }));
+        onSetDate(sub(date, { months: 1 }));
     }
     
     function onNext() {
-        setDate(add(date, { months: 1 }));
+        onSetDate(add(date, { months: 1 }));
     }
 
     return (

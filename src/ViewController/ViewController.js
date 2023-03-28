@@ -5,6 +5,16 @@ import { MdLocationOn } from 'react-icons/md';
 
 import { Button } from "@chakra-ui/react";
 
+import {
+    Popover,
+    PopoverTrigger,
+    PopoverContent,
+    PopoverBody,
+    PopoverArrow,
+    PopoverCloseButton,
+    Portal
+  } from '@chakra-ui/react'
+
 const ViewSwitcherMap = {
     [ViewMode.Calendar]: ({ setViewMode }) => {
         return (
@@ -29,11 +39,29 @@ const ViewSwitcherMap = {
     }
 }
 
-function ViewController({ views, setViewMode }) {
+const ViewImageMap = {
+    [ViewMode.Calendar]: <AiOutlineCalendar width='100%' height='100%' />,
+    [ViewMode.List]: <AiOutlineUnorderedList width='100%' height='100%' />,
+    [ViewMode.Map]: <MdLocationOn width='100%' height='100%' />
+}
+
+function ViewController({ mode, views, setViewMode }) {
     return (
-        <div className='Horizontal ViewController'>
-            { views.map(v => ViewSwitcherMap[v]({ setViewMode })) }
-        </div>
+        <Popover>
+            <PopoverTrigger>
+                <Button height='90%' colorScheme='blue'>{ ViewImageMap[mode] }</Button>
+            </PopoverTrigger>
+            <Portal>
+                <PopoverContent width='fit-content'>
+                    <PopoverArrow />
+                    <PopoverBody>
+                        <div className='Horizontal ViewController'>
+                            { views.map(v => ViewSwitcherMap[v]({ setViewMode })) }
+                        </div>
+                    </PopoverBody>
+                </PopoverContent>
+            </Portal>
+        </Popover>
     );
 }
 

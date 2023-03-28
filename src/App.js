@@ -20,22 +20,30 @@ import getEvents from './Events/Events';
 import { AiOutlineClose, AiOutlineClear } from 'react-icons/ai';
 import { Button } from '@chakra-ui/react';
 
-function PopupContent({ events, onClose }) {
+function PopupContent({ events, date, renderCell, renderHeader, mode, views, setMode, onClose }) {
+  console.log(mode, views);
   const style = { borderRadius: '4px', backgroundColor: 'white', margin: 'auto', width: '60%', height: '60%' };
-  
-  const [mode, setMode] = useState(ViewMode.List);
   
   return (
     <div style={style}>
         <div className="NavigationBar">
-          <ViewController views={[ViewMode.List, ViewMode.Map]} setViewMode={(mode) => setMode(mode)} />
+          <ViewController mode={mode} views={views} setViewMode={setMode} />
           <Button colorScheme='blue' style={{ height: '90%' }} onClick={onClose}>
             <AiOutlineClose width='100%' height='100%' />
           </Button>
         </div>
         <div className='Container'>
-          <List events={events} isActive={mode === ViewMode.List} />
-          <Map events={events} isActive={mode === ViewMode.Map} prefix={"secondary"} />
+          { views.map(view => {
+            if (view === ViewMode.Calendar) {
+              return <Calendar prefix={'secondary'} date={date} events={events} isActive={mode === ViewMode.Calendar} renderHeader={renderHeader} renderCell={renderCell} />;
+            } else if (view === ViewMode.List) {
+              return <List prefix={'secondary'} events={events} isActive={mode === ViewMode.List} />; 
+            } else if (view === ViewMode.Map) {
+              return <Map prefix={"secondary"} events={events} isActive={mode === ViewMode.Map} />;
+            } else {
+              return null;
+            }
+          })}
         </div>
     </div>
   );
@@ -51,6 +59,8 @@ function App() {
   const [mode, setMode] = useState(ViewMode.Calendar);
   const [tagsFilter, setTagsFilter] = useState([]);
   const [chosenTags, setChosenTags] = useState([]);
+  const [popupMode, setPopupMode] = useState(ViewMode.Calendar);
+  const [popupViews, setPopupViews] = useState([]);
 
   useEffect(() => {
     async function loadEvents() {
@@ -68,7 +78,10 @@ function App() {
     loadEvents();
   }, []);
 
-  function onSelection(items) {
+  function onSelection(items, senderMode) {
+    const views = [ViewMode.Calendar, ViewMode.List, ViewMode.Map].filter(v => v !== senderMode);
+    setPopupMode(views[0]);
+    setPopupViews(views);
     setPopupItems(items);
   }
 
@@ -77,7 +90,8 @@ function App() {
   }
 
   function onStopSelection(event) {
-    setPopupPosition(['87%', '82%']);
+    const staticPosition = ['87%', '82%'];
+    setPopupPosition(staticPosition);
     // setPopupPosition([event.pageX, event.pageY]);
   }
 
@@ -134,7 +148,7 @@ function App() {
       <div className="NavigationBar">
         <div style={{display:'flex'}}>
           <DateController date={date} onSetDate={(date) => setDate(date)} />
-          <ViewController views={[ViewMode.Calendar, ViewMode.List, ViewMode.Map]} setViewMode={(mode) => setMode(mode)} />
+          <ViewController mode={mode} views={[ViewMode.Calendar, ViewMode.List, ViewMode.Map]} setViewMode={(mode) => setMode(mode)} />
           <FilterControl date={date} 
                          tags={
                           tagsFilter.map((tag) => 
@@ -150,18 +164,18 @@ function App() {
       </div>
         
 
-      <Popup content={popupItems ? <PopupContent onClose={() => setShowSelection(false)} events={popupItems} /> : null} 
+      <Popup content={popupItems ? <PopupContent date={date} onClose={() => setShowSelection(false)} renderHeader={renderHeader} renderCell={renderDay} events={popupItems} setMode={setPopupMode} mode={popupMode} views={popupViews} /> : null} 
              isShow={showSelection} 
              onClose={() => setShowSelection(false)} />
       <SelectionConfirmation position={popupPosition} selection={popupItems} onConfirm={onConfirm} onClose={onClose} />
       <div className='Container'>
-        <Calendar events={events} date={date} 
+        <Calendar prefix={'main'} events={events} date={date} 
                   onStopSelection={onStopSelection} onStartSelection={closePopup}
                   onSelection={onSelection}
                   renderHeader={renderHeader} renderCell={renderDay}
                   isActive={mode === ViewMode.Calendar} />
-        <List events={events} isActive={mode === ViewMode.List} />
-        <Map events={events} onEventClick={onStopSelection} isActive={mode === ViewMode.Map} prefix={"main"} />
+        <List prefix={'main'} events={events} isActive={mode === ViewMode.List} />
+        <Map prefix={"main"} events={events} onSelection={onSelection} onEventClick={onStopSelection} isActive={mode === ViewMode.Map} />
       </div>
 
     </div>

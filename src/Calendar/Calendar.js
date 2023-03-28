@@ -15,11 +15,12 @@ import {
     Th,
     Td,
   } from '@chakra-ui/react'
+import { ViewMode } from '../ViewController';
 
 const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const emptySelectionSet = new Set();
 
-function Calendar({ date, events, renderCell, renderHeader, onSelection, onStopSelection, onStartSelection, isActive }) {
+function Calendar({ prefix, date, events, renderCell, renderHeader, onSelection, onStopSelection, onStartSelection, isActive }) {
     const currentSelection = useRef(emptySelectionSet);
     const isCollecting = useRef(false);
 
@@ -33,7 +34,7 @@ function Calendar({ date, events, renderCell, renderHeader, onSelection, onStopS
 
     useEffect(() => {
         if (isSelectionChanged && selection.length) {
-            onSelection(getEventsForSelection(events, selection.map(index => calendarDays[index])));
+            onSelection(getEventsForSelection(events, selection.map(index => calendarDays[index])), ViewMode.Calendar);
         }
     });
 
@@ -121,7 +122,8 @@ function Calendar({ date, events, renderCell, renderHeader, onSelection, onStopS
     }
     
     return ( 
-        <TableContainer overflowY={'scroll'} className={`Calendar ${isActive ? '' : 'Hidden'}`}>
+        <TableContainer key={`calendar-${prefix}`} width='100%'
+            height='100%' overflowY={'scroll'} className={`Calendar ${isActive ? '' : 'Hidden'}`}>
             <Table variant='simple'
                    width='100%'
                    height='100%'

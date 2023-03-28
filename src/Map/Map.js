@@ -4,15 +4,17 @@ import { useEffect } from 'react';
 
 import 'mapbox-gl/src/css/mapbox-gl.css';
 import './Map.css';
+import { ViewMode } from '../ViewController';
 
 function sourceFromEvents(events) {
+    const features = events.map(event => ({ type: 'Feature', properties: event, geometry: { type: 'Point', coordinates: event.coordinates } }));
     return {
         'type': 'FeatureCollection',
-        'features': events.map(event => ({ type: 'Feature', properties: event, geometry: { type: 'Point', coordinates: event.coordinates } }))
+        'features': features
     };
 }
 
-function Map({ events, isActive, onEventClick, prefix }) {
+function Map({ events, isActive, onSelection, onEventClick, prefix }) {
     const map = useRef(null);
 
     useEffect(() => {
@@ -43,7 +45,12 @@ function Map({ events, isActive, onEventClick, prefix }) {
             });
 
             map.current.on('click', 'events', (e) => {
-                console.log(e, e.features);
+                const events = e.features.map(({ properties }) => ({ 
+                    ...properties, 
+                    tags: eval(properties.tags), 
+                    coordinates: eval(properties.coordinates)
+                }));
+                onSelection(events, ViewMode.Map);
                 onEventClick(e.originalEvent);
             });
         });

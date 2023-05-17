@@ -4,6 +4,8 @@ import { useEffect } from 'react';
 
 import 'mapbox-gl/src/css/mapbox-gl.css';
 import './Map.css';
+
+import { bbox, lineString } from '@turf/turf';
 import { ViewMode } from '../ViewController';
 
 function sourceFromEvents(events) {
@@ -14,8 +16,10 @@ function sourceFromEvents(events) {
     };
 }
 
-function Map({ events, isActive, onSelection, onEventClick, prefix }) {
+function Map({ events, selectedEvents, isActive, onSelection, onEventClick, prefix }) {
     const map = useRef(null);
+
+    console.log(events, selectedEvents, isActive);
 
     useEffect(() => {
         if (map.current) return;
@@ -34,6 +38,11 @@ function Map({ events, isActive, onSelection, onEventClick, prefix }) {
                 data: sourceFromEvents([])
             });
 
+            map.current.addSource('selected-events', {
+                type: 'geojson',
+                data: sourceFromEvents([])
+            });
+
             map.current.addLayer({
                 id: 'events',
                 source: 'events',
@@ -44,14 +53,23 @@ function Map({ events, isActive, onSelection, onEventClick, prefix }) {
                 },
             });
 
-            map.current.on('click', 'events', (e) => {
+            map.current.addLayer({
+                id: 'selected-events',
+                source: 'selected-events',
+                type: 'circle',
+                paint: {
+                    'circle-radius': 6,
+                    'circle-color': '#FFA500'
+                },
+            });
+
+            map.current.on('click', ['events', 'selected-events'] , (e) => {
                 const events = e.features.map(({ properties }) => ({ 
-                    ...properties, 
+                    ...properties,
                     tags: eval(properties.tags), 
                     coordinates: eval(properties.coordinates)
                 }));
                 onSelection(events, ViewMode.Map);
-                onEventClick(e.originalEvent);
             });
         });
     });
@@ -60,17 +78,32 @@ function Map({ events, isActive, onSelection, onEventClick, prefix }) {
         if (!map.current) return;
 
         const source = map.current.getSource('events');
+        const selectedSource = map.current.getSource('selected-events');
 
-        if (!source) return;
+        if (!source || !selectedSource) return;
 
         if (events.length) {
-            source.setData(sourceFromEvents(events));
-            map.current.flyTo({
-                center: events[0].coordinates,
-                essential: true
-            });
+            const notSelectedEvents = events.filter(event => !selectedEvents.some(ev => ev.id === event.id));
+
+            const sourceData = sourceFromEvents(notSelectedEvents);
+            source.setData(sourceData);
+
+            const selectedSourceData = sourceFromEvents(selectedEvents);
+            selectedSource.setData(selectedSourceData);
+
+            if (selectedEvents.length > 1) {
+                const bboxInput = selectedEvents.length ? selectedSourceData : sourceData;
+                const deltas = [-1e-3, -1e-3, 1e-3, 1e-3];    
+                const bboxData = bbox(lineString(bboxInput.features.map(f => f.geometry.coordinates))).map((coord, idx) => coord + deltas[idx]);
+                map.current.fitBounds(bboxData);
+            } else if (selectedEvents.length === 1) {
+                map.current.flyTo({
+                    center: selectedEvents[0].coordinates,
+                    essential: true
+                });
+            }
         }
-    }, [events, isActive]);
+    }, [selectedEvents, events, isActive]);
 
     return (
         <div className={`Map ${isActive ? '' : 'Hidden'}`} id={`map-${prefix}`} />

@@ -1,7 +1,8 @@
 import { Tag as ChakraTag } from "@chakra-ui/react";
 
 export default function Tag({ value, isActive, onClick }) {
-    const style = { cursor: 'pointer', display: 'block', overflow: 'auto' };
+    const style = { margin: '3px', cursor: 'pointer', display: 'block', overflow: 'auto', width: 'fit-content' };
+    const colorScheme = isActive ? 'teal' : 'blackAlpha';
     function onClickHandler(event) {
         onClick(value);
         event.preventDefault();
@@ -9,9 +10,7 @@ export default function Tag({ value, isActive, onClick }) {
     return (
         <div style={style} 
              onClick={onClickHandler}>
-            <ChakraTag colorScheme={isActive ? 'teal' : 'blackAlpha'}
-                       variant='outline' size='sm' margin={'3px'}
-                       float='left' >
+            <ChakraTag colorScheme={ colorScheme } variant='outline' size='sm'>
                 { value }
             </ChakraTag>
         </div>

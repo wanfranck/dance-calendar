@@ -1,14 +1,13 @@
 .List {
     display: block;
-    position: absolute;
     width: 100%;
-    height: 100%;
+    height: 80%;
     overflow: scroll;
 }
 
 .Element {
     display: inline-block;
-    height: 20%;
+    height: 25%;
     width: 100%;
     background-color: white;
 }

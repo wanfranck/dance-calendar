@@ -8,6 +8,11 @@ const readerOptions = {
   returnAllResults: true
 };
 
+const loremIpsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+commodo consequat.`;
+
 const parseTags = (event) => {
     return Array.from(event.tags.split(',').reduce((tags, tag) => {
         tags.add(tag);
@@ -23,10 +28,13 @@ async function getEvents() {
     let events = await new Promise((resolve, _) => {
         reader(
             readerOptions, 
-            results => resolve(results.map(item => ({ ...item, tags: parseTags(item), coordinates: parseCoords(item) }))),
-            error => {
-                resolve(fallbackEvents.map(item => ({ ...item, tags: parseTags(item), coordinates: parseCoords(item) })));
-            }
+            results => resolve(results.map((item, idx) => ({ 
+                ...item, description: [item.description, loremIpsum].join('\n'), 
+                link: "https://www.instagram.com/e.s.d.a/",
+                tags: parseTags(item), coordinates: parseCoords(item), id: idx }))),
+            _ => resolve(fallbackEvents.map((item, idx) => ({ 
+                ...item, 
+                tags: parseTags(item), coordinates: parseCoords(item), id: idx })))
         );
     });
 

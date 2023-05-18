@@ -1,7 +1,6 @@
 .Map {
-    width: 100%;
+    width: 60%;
     height: 100%;
-    position: absolute;
 }
 
 .mapboxgl-ctrl-attrib-inner {

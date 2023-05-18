@@ -62,8 +62,6 @@ function Map({ currentEvents, selectedEvents, isActive, onSelection, prefix }) {
                 },
             });
 
-            map.current.on('click', ['events', 'selected-events'], (event) => onSelection(event.originalEvent, event.features));
-
             setLoaded(true);
         });
     });
@@ -89,7 +87,13 @@ function Map({ currentEvents, selectedEvents, isActive, onSelection, prefix }) {
                 zoom: 9
             });
         }
-    }, [currentEvents, isLoaded, isActive]);
+
+        const listener = (event) => onSelection(event.originalEvent, event.features);
+        map.current.on('click', ['events', 'selected-events'], listener);
+        return () => {
+            map.current.off('click', ['events', 'selected-events'], listener);
+        } 
+    }, [currentEvents, isLoaded, isActive, onSelection]);
 
     useEffect(() => {
         if (!isLoaded) return;
@@ -97,8 +101,13 @@ function Map({ currentEvents, selectedEvents, isActive, onSelection, prefix }) {
         const selectedSource = map.current.getSource('selected-events');
         const selectedSourceData = sourceFromEvents(selectedEvents);
         selectedSource.setData(selectedSourceData);
-    
-    }, [selectedEvents, isActive, isLoaded]);
+
+        const listener = (event) => onSelection(event.originalEvent, event.features);
+        map.current.on('click', ['events', 'selected-events'], listener);
+        return () => {
+            map.current.off('click', ['events', 'selected-events'], listener);
+        }    
+    }, [selectedEvents, isActive, isLoaded, onSelection]);
 
     return (
         <div className={`Map ${isActive ? '' : 'Hidden'}`} id={`map-${prefix}`} />

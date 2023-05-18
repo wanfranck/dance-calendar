@@ -14,22 +14,15 @@ import { Button } from '@chakra-ui/react';
 import { isEventInDay } from './Utils/EventUtils';
 import { isCurrentDay, getFirstDayOfMonth } from './Utils/TimeUtils';
 
-function App({ events }) {
+const App = ({ events }) => {
   const [currentDate, setDate] = useState(new Date());
 
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [selectedEvents, setSelectedEvents] = useState([]);
- 
-  console.log("filteredEvents !!: ", filteredEvents);
-  console.log("selectedEvents !!: ", selectedEvents);
 
   const [selection, setDaysSelection] = useState([]);
   const [tagsFilter, setTagsFilter] = useState([]);
   const [chosenTags, setChosenTags] = useState([]);
-
-  useEffect(() => {
-    return () => { console.log("Unmounted NAHUI"); };
-  }, []);
 
   useEffect(() => {
     const lastMonth = add(currentDate, {months: 3});
@@ -49,22 +42,16 @@ function App({ events }) {
   }, [events, currentDate]);
 
   const onCalendarSelection = (e, dates) => {
-    console.log("onCalendarSelection");
     const isAdd = e.ctrlKey || e.metaKey;
 
     const newSelection = isAdd ? selection.concat(dates) : dates;
     const newItems = events.filter(event => newSelection.some(day => isEventInDay(event, day)));
 
-    console.log(selection);
     setDaysSelection(newSelection);
-    console.log(filteredEvents, selectedEvents, newItems);
-    console.log(1);
     setSelectedEvents(newItems);
-    console.log('AFTER', filteredEvents, selectedEvents, newItems);
   }
 
   const onMapSelection = (e, items) => {
-    console.log("onMapSelection");
     const isAdd = e.ctrlKey || e.metaKey;
 
     const newEvents = items.map(({ properties }) => ({ 
@@ -73,15 +60,11 @@ function App({ events }) {
         coordinates: eval(properties.coordinates)
     }));
 
-    console.log(filteredEvents, selectedEvents, newEvents);
-    console.log(2);
     setSelectedEvents(isAdd ? [...selectedEvents, ...newEvents] : newEvents);
-    console.log('AFTER', filteredEvents, selectedEvents, newEvents);
   }
 
   const onClearSelection = (_) => {
     setDaysSelection([]);
-    console.log(3);
     setSelectedEvents([]);
   }
 

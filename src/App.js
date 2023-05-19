@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { add, format, parse } from 'date-fns';
 
 import './App.css';
@@ -24,18 +24,21 @@ const App = ({ events }) => {
   const [tagsFilter, setTagsFilter] = useState([]);
   const [chosenTags, setChosenTags] = useState([]);
 
-  useEffect(() => {
+  const getTimeRangedEvents = (events, currentDate) => {
     const lastMonth = add(currentDate, {months: 3});
     const timeRange = [
       getFirstDayOfMonth(currentDate.getFullYear(), currentDate.getMonth()), 
       getFirstDayOfMonth(lastMonth.getFullYear(), lastMonth.getMonth())
     ];
     
-    const filteredEvents = events.filter(event => {
+    return events.filter(event => {
       const date = parse(event.date, "dd-MM-yyyy", new Date());
       return date >= timeRange[0] && date < timeRange[1];
     });
-    setFilteredEvents(filteredEvents);
+  };
+
+  useEffect(() => {
+    setFilteredEvents(getTimeRangedEvents(events, currentDate));
 
     const allTags = events.reduce((acc, ev) => new Set([...new Set(ev.tags), ...acc]), new Set());
     setTagsFilter([...allTags]);
@@ -51,31 +54,43 @@ const App = ({ events }) => {
     setSelectedEvents(newItems);
   }
 
-  const onMapSelection = (e, items) => {
-    const isAdd = e.ctrlKey || e.metaKey;
+  const onMapSelection = useCallback((event) => {
+    const { originalEvent, features } = event;
+    const isAdd = originalEvent.ctrlKey || originalEvent.metaKey;
 
-    const newEvents = items.map(({ properties }) => ({ 
+    const newEvents = features.map(({ properties }) => ({ 
         ...properties,
         tags: eval(properties.tags), 
         coordinates: eval(properties.coordinates)
     }));
 
-    setSelectedEvents(isAdd ? [...selectedEvents, ...newEvents] : newEvents);
-  }
+    const newSelection = isAdd ? [...selectedEvents, ...newEvents] : newEvents;
+    const newItems = newSelection.reduce((acc, event) => {
+      const eventDate = parse(event.date, "dd-MM-yyyy", new Date());
+      const alreadyHas = acc.some(date => date.getTime() === eventDate.getTime());
+      return alreadyHas ? acc : [...acc, eventDate];
+    }, []);
+
+    setDaysSelection(newItems);
+    setSelectedEvents(newSelection);
+  }, [selectedEvents]);
 
   const onClearSelection = (_) => {
+    setChosenTags([]);
     setDaysSelection([]);
     setSelectedEvents([]);
+    setFilteredEvents(getTimeRangedEvents(events, currentDate));
   }
 
   const onSetTagFilter = (tag) => {
-    console.log(onSetTagFilter);
     const newChosenTags = [...new Set(
       [...chosenTags.filter(t => [tag].indexOf(t) === -1), 
        ...[tag].filter(t => chosenTags.indexOf(t) === -1)]
     )];
+    const timeRangedEvents = getTimeRangedEvents(events, currentDate);
+
     setChosenTags(newChosenTags);
-    setFilteredEvents(newChosenTags.length ? filteredEvents.filter(event => event.tags.some(tag => newChosenTags.indexOf(tag) !== -1)) : filteredEvents);
+    setFilteredEvents(newChosenTags.length ? timeRangedEvents.filter(event => newChosenTags.every(tag => event.tags.indexOf(tag) !== -1)) : timeRangedEvents);
   }
 
   const renderDay = (date) => {

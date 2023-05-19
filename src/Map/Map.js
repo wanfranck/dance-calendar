@@ -67,6 +67,14 @@ function Map({ currentEvents, selectedEvents, isActive, onSelection, prefix }) {
     });
 
     useEffect(() => {
+        const listener = (event) => onSelection(event);
+        map.current.on('click', ['events', 'selected-events'], listener);
+        return () => {
+            map.current.off('click', ['events', 'selected-events'], listener);
+        }
+    }, [currentEvents, selectedEvents, onSelection]);
+
+    useEffect(() => {
         if (!isLoaded) return;
         
         const source = map.current.getSource('events');
@@ -84,30 +92,18 @@ function Map({ currentEvents, selectedEvents, isActive, onSelection, prefix }) {
             map.current.flyTo({
                 center: currentEvents[0].coordinates,
                 essential: true,
-                zoom: 9
+                zoom: 12
             });
         }
-
-        const listener = (event) => onSelection(event.originalEvent, event.features);
-        map.current.on('click', ['events', 'selected-events'], listener);
-        return () => {
-            map.current.off('click', ['events', 'selected-events'], listener);
-        } 
-    }, [currentEvents, isLoaded, isActive, onSelection]);
+    }, [currentEvents, isLoaded, isActive]);
 
     useEffect(() => {
         if (!isLoaded) return;
     
         const selectedSource = map.current.getSource('selected-events');
         const selectedSourceData = sourceFromEvents(selectedEvents);
-        selectedSource.setData(selectedSourceData);
-
-        const listener = (event) => onSelection(event.originalEvent, event.features);
-        map.current.on('click', ['events', 'selected-events'], listener);
-        return () => {
-            map.current.off('click', ['events', 'selected-events'], listener);
-        }    
-    }, [selectedEvents, isActive, isLoaded, onSelection]);
+        selectedSource.setData(selectedSourceData); 
+    }, [selectedEvents, isActive, isLoaded]);
 
     return (
         <div className={`Map ${isActive ? '' : 'Hidden'}`} id={`map-${prefix}`} />

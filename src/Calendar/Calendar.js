@@ -20,11 +20,11 @@ function Calendar({ date, lookAhead, onSelection, onSetDate, renderDay, isActive
     return (
         <div className={`Calendar ${isActive ? '' : 'Hidden'}`} >
             <div style={buttonStyle}>
-                <Button height='40%' colorScheme='blue' onClick={() => onSetDate(sub(date, { months: 1 }))}><AiOutlineLeft width='100%' height='100%' /></Button>
+                <Button height='40%' colorScheme='teal' onClick={() => onSetDate(sub(date, { months: 1 }))}><AiOutlineLeft width='100%' height='100%' /></Button>
             </div>        
             {months}
             <div style={buttonStyle}>
-                <Button height='40%' colorScheme='blue' onClick={() => onSetDate(add(date, { months: 1 }))}><AiOutlineRight width='100%' height='100%' /></Button>
+                <Button height='40%' colorScheme='teal' onClick={() => onSetDate(add(date, { months: 1 }))}><AiOutlineRight width='100%' height='100%' /></Button>
             </div>
         </div>
     );

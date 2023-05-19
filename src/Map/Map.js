@@ -17,10 +17,16 @@ function sourceFromEvents(events) {
     };
 }
 
-function Map({ currentEvents, selectedEvents, isActive, onSelection, prefix }) {
+function Map({ currentEvents, selectedEvents, isActive, onSelection, prefix, windowSize }) {
     const map = useRef(null);
     const [isLoaded, setLoaded] = useState(false);
 
+    useEffect(() => {
+        if (!isLoaded) return;
+        
+        map.current.resize();
+    }, [windowSize, isLoaded]);
+    
     useEffect(() => {
         if (map.current) return;
 

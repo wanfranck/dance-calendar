@@ -1,5 +1,4 @@
 #root {
-  background-color: black;
   width: 100vw;
   height: 100vh;  
 }
@@ -20,10 +19,6 @@
 .NavigationBar {
   display: flex;
   width: 100%;
-  gap: 10px;
-  background-color: #248BD6;
-  border: 2px solid #0F6BAE;
-  padding: 2px;
   height: 5%;
 }
 

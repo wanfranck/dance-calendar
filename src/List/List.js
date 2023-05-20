@@ -1,50 +1,58 @@
 import './List.css';
 
-import {
-    Accordion,
-    AccordionItem,
-    AccordionButton,
-    AccordionPanel,
-    AccordionIcon,
-    Box
-} from '@chakra-ui/react'
-
 import Tag from '../Tag';
+import { useState } from 'react';
+import { BsInstagram } from 'react-icons/bs';
+
+function ListItem({ item, isSelected, onClick }) {
+    const [isCollapsed, setCollapsed] = useState(true);
+
+    const rootItemStyle = { display: 'inline-block', flexDirection: 'column', backgroundColor: isSelected ? 'grey' : 'white' };
+    const itemPreview = { height: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', cursor: 'pointer' };
+    const itemTitleStyle = { padding: '10px', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', height: '100%', width: '100%' };
+
+    return (
+        <div className='Item Element' style={rootItemStyle}>
+            <div style={itemPreview} onClick={_ => setCollapsed(!isCollapsed)}>
+                <div style={{ display: 'flex' }}>
+                    <img alt="Item" style={{ height: '100%', objectFit: 'contain' }} src={item.image} />
+                
+                    <div style={itemTitleStyle}>
+                        <div style={{ height: '100%', width: '100%', display:'flex', flexDirection:'column' }}>
+                            <div style={{ height: '33%' }}> { item.title } </div>
+                            <div style={{ height: '33%' }}><b> { item.date } </b></div>
+                            <div style={{ height: '33%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                                <BsInstagram onClick={(event) => onClick(event, item)} />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style={{ display: 'block', overflow: 'hidden', height: isCollapsed ? '0px' : 'fit-content', backgroundColor: isSelected ? 'grey' : 'white' }}>
+                <div style={{ display: 'flex', marginTop: '5px' }}>
+                    { item.tags.map((t, idx) => <Tag key={`tag-${idx}`} value={t} />) }
+                </div>
+                <div style={{ padding: '0 5px' }}>
+                    { item.description }
+                </div>
+            </div>
+        </div>
+    );
+}
 
 function List({ prefix, events, onItemClick, isActive }) {
-    console.log(events);
-
-    function onClickHandler(event, item) {
+    const onClickHandler = (event, item) => {
         onItemClick(item);
         event.preventDefault();
         event.stopPropagation();
     }
 
+    const groupedEvents = events.reduce((acc, event) => (event.isSelected ? { ...acc, selected: [...acc.selected, event] } : { ...acc, rest: [...acc.rest, event] }), { selected: [], rest: [] });
+
     return (
         <div key={`list-${prefix}`} className={`List ${isActive ? '' : 'Hidden'}`}>
-            <Accordion width={'100%'} height={'100%'} allowToggle>
-                {events.map((item, idx) => 
-                    <AccordionItem key={`list-item-${idx}`} className='Item Element'>
-                        <div style={{ height: '100%', display:'flex', gap: '2%', flexDirection:'row', justifyContent: 'stretch' }}>
-                            <img alt="Item" style={{ height: '100%', objectFit: 'contain' }} src={item.image} />
-                            <Box onClick={(event) => onClickHandler(event, item)} cursor='pointer' padding={'10px'} display={'flex'} flexDirection={'row'} justifyContent={'space-between'} height='100%' width='100%' key={`list-item-${idx}`}>
-                                <div style={{ height: '100%', width: '100%', display:'flex', flexDirection:'column', justifyContent: 'space-between'}}>
-                                    <p> {item.title} <b>{item.date}</b> </p>
-                                    <div>
-                                        { item.tags.map((t, idx) => <Tag key={`tag-${idx}`} value={t} />) }
-                                    </div>
-                                </div>
-                            </Box>
-                            <AccordionButton style={{width: 'fit-content'}}>
-                                <AccordionIcon />
-                            </AccordionButton>
-                        </div>
-                        <AccordionPanel pb={4}>
-                            { item.description }
-                        </AccordionPanel>
-                    </AccordionItem>
-                )}
-            </Accordion>
+            { groupedEvents.selected.map((item, idx) => <ListItem key={`list-item-${idx}`} isSelected={item.isSelected} item={item} onClick={(event, item) => onClickHandler(event, item)} />) }
+            { groupedEvents.rest.map((item, idx) => <ListItem key={`list-item-${idx}`} isSelected={item.isSelected} item={item} onClick={(event, item) => onClickHandler(event, item)} />) }
         </div>
     );
 }

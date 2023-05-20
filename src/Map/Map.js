@@ -6,6 +6,7 @@ import 'mapbox-gl/src/css/mapbox-gl.css';
 import './Map.css';
 
 import { bbox, lineString } from '@turf/turf';
+import { battleImage, labImage, trainImage, defaultImage, trainImageSelected, battleImageSelected, labImageSelected, defaultImageSelected } from '../Icons';
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiYW50b24tbGFzaGNoYW5rYSIsImEiOiJjbGY1anhha3MwbGpoM3lxaGZmaHM4dWliIn0.JyEoFVACqTIpRpTZzSIFvg';
 
@@ -17,7 +18,7 @@ function sourceFromEvents(events) {
     };
 }
 
-function Map({ currentEvents, selectedEvents, isActive, onSelection, prefix, windowSize }) {
+function Map({ events, isActive, onSelection, prefix, windowSize }) {
     const map = useRef(null);
     const [isLoaded, setLoaded] = useState(false);
 
@@ -43,29 +44,36 @@ function Map({ currentEvents, selectedEvents, isActive, onSelection, prefix, win
                 data: sourceFromEvents([])
             });
 
-            map.current.addSource('selected-events', {
-                type: 'geojson',
-                data: sourceFromEvents([])
-            });
+            map.current.addImage('train-image', trainImage);
+            map.current.addImage('train-image-selected', trainImageSelected);
+            map.current.addImage('battle-image', battleImage);
+            map.current.addImage('battle-image-selected', battleImageSelected);
+            map.current.addImage('lab-image', labImage);
+            map.current.addImage('lab-image-selected', labImageSelected);
+            map.current.addImage('default-image', defaultImage);
+            map.current.addImage('default-image-selected', defaultImageSelected); 
+
+            const getImage = (prefix) => [
+                'match', ['get', 'type'],
+                'camp', `train-image${prefix}`,
+                'battle', `battle-image${prefix}`,
+                'lab', `lab-image${prefix}`,
+                `default-image${prefix}`
+            ];
 
             map.current.addLayer({
                 id: 'events',
                 source: 'events',
-                type: 'circle',
-                paint: {
-                    'circle-radius': 6,
-                    'circle-color': '#B42222'
-                },
-            });
-
-            map.current.addLayer({
-                id: 'selected-events',
-                source: 'selected-events',
-                type: 'circle',
-                paint: {
-                    'circle-radius': 6,
-                    'circle-color': '#FFA500'
-                },
+                type: 'symbol',
+                layout: {
+                    'icon-image': [
+                        'case', ['get', 'isSelected'], 
+                        getImage('-selected'), 
+                        getImage('')
+                    ],
+                    'icon-size': 0.4,
+                    'icon-allow-overlap': true
+                }
             });
 
             setLoaded(true);
@@ -78,38 +86,30 @@ function Map({ currentEvents, selectedEvents, isActive, onSelection, prefix, win
         return () => {
             map.current.off('click', ['events', 'selected-events'], listener);
         }
-    }, [currentEvents, selectedEvents, onSelection]);
+    }, [events, onSelection]);
 
     useEffect(() => {
         if (!isLoaded) return;
         
         const source = map.current.getSource('events');
-        const sourceData = sourceFromEvents(currentEvents);
+        const sourceData = sourceFromEvents(events);
         source.setData(sourceData);
 
-        if (!currentEvents.length) return;
+        if (!events.length) return;
 
-        if (currentEvents.length > 1) {
+        if (events.length > 1) {
             const bboxInput = sourceData;
             const deltas = [-1e-3, -1e-3, 1e-3, 1e-3];    
             const bboxData = bbox(lineString(bboxInput.features.map(f => f.geometry.coordinates))).map((coord, idx) => coord + deltas[idx]);
             map.current.fitBounds(bboxData);
-        } else if (currentEvents.length === 1) {
+        } else if (events.length === 1) {
             map.current.flyTo({
-                center: currentEvents[0].coordinates,
+                center: events[0].coordinates,
                 essential: true,
                 zoom: 12
             });
         }
-    }, [currentEvents, isLoaded, isActive]);
-
-    useEffect(() => {
-        if (!isLoaded) return;
-    
-        const selectedSource = map.current.getSource('selected-events');
-        const selectedSourceData = sourceFromEvents(selectedEvents);
-        selectedSource.setData(selectedSourceData); 
-    }, [selectedEvents, isActive, isLoaded]);
+    }, [events, isLoaded, isActive]);
 
     return (
         <div className={`Map ${isActive ? '' : 'Hidden'}`} id={`map-${prefix}`} />

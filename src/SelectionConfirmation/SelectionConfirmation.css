@@ -1,7 +1,0 @@
-.SelectionConfirmation {
-    display: block;
-    position: absolute;
-    width: fit-content;
-    background-color: white;
-    z-index: 1;
-}

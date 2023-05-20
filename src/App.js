@@ -8,9 +8,6 @@ import List from './List';
 import Map from './Map';
 import FilterControl from './FilterControl';
 
-import { AiOutlineClear } from 'react-icons/ai';
-import { Button } from '@chakra-ui/react';
-
 import { isEventInDay } from './Utils/EventUtils';
 import { isCurrentDay, getFirstDayOfMonth } from './Utils/TimeUtils';
 import { useWindowSize } from './Utils/ReactUtils';
@@ -104,10 +101,11 @@ const App = ({ events }) => {
       flexDirection: 'column',
       justifyContent: 'center', 
       textAlign:'center',
-      width: '95%', 
-      height: '95%', 
+      width: '100%', 
+      height: '100%', 
       backgroundColor: cellColor, 
-      border: isCurrentDay(date) ? '2px solid red' : '' 
+      border: isCurrentDay(date) ? '2px solid red' : 'solid grey 1px', 
+      borderRadius: '4px'
     };
     
     return (
@@ -117,7 +115,6 @@ const App = ({ events }) => {
     );
   }
 
-  console.log(size);
   const countLookAhead = (size) => {
     if (size.width < 800) return 1;
     if (size.width < 1150) return 2;
@@ -126,46 +123,61 @@ const App = ({ events }) => {
   }
   const lookAhead = countLookAhead(size);
 
+  const isSmall = size.width < 1150;
+  const mapContainerStyle = { width: isSmall ? '100%' : '60%', height: isSmall ? '50%' : '100%', [isSmall ? 'marginBottom' : 'marginRight']: '1px' };
+  const listContainerStyle = { width: isSmall ? '100%' : '40%', height: isSmall ? '50%' : '100%', [isSmall ? 'marginTop' : 'marginLeft']: '1px' };
+  const upperSection = { width: '100%', height: '50%', marginBottom: '1px' };
+  const lowerSection = { display: 'flex', flexDirection: isSmall ? 'column' : 'row', width: '100%', height: isSmall ? '100%' : '50%', marginTop: '1px' };
+
+  const isEventSelected = (event) => {
+    return selectedEvents.some(ev => ev.id === event.id);
+  }
+
+  const mappedEvents = filteredEvents.map(ev => ({ ...ev, isSelected: isEventSelected(ev) }));
+  mappedEvents.sort((lhs, rhs) => {
+      if (isEventSelected(lhs) && !isEventSelected(rhs)) {
+          return -1;
+      } else if (isEventSelected(rhs) && isEventSelected(lhs)) {
+          return 1;
+      }
+
+      return 0;
+  });
+
   return (
     <div className="App">
       <div className="NavigationBar" style={{ justifyContent:'space-between' }}>
-        <div style={{display:'flex'}}>
+        <div style={{ display:'flex' }}>
           <FilterControl date={currentDate} 
-                         tags={
-                          tagsFilter.map((tag) => 
-                            ({ value: tag, isActive: chosenTags.indexOf(tag) !== -1}))
-                         } 
+                         tags={tagsFilter.map((tag) => ({ value: tag, isActive: chosenTags.indexOf(tag) !== -1 }))} 
                          onChangeDate={d => setDate(d)} 
-                         onChangeFilter={tag => onSetTagFilter(tag)} />
+                         onChangeFilter={tag => onSetTagFilter(tag)}
+                         onClearSelection={onClearSelection} />
         </div>
-        
-        <Button colorScheme='blue' style={{ height: '90%' }} 
-            onClick={event => onClearSelection(event)}>
-          <AiOutlineClear width='100%' height='100%' />
-        </Button>
       </div>
 
       <div className='Container'>
-        <Calendar prefix={'main'} 
-            onSelection={onCalendarSelection}
-            onSetDate={(date) => setDate(date)}
-            renderDay={renderDay} 
-            date={currentDate}
-            lookAhead={lookAhead} 
-            isActive={true} />
+        <div style={upperSection}>
+          <Calendar prefix={'main'} 
+              onSelection={onCalendarSelection}
+              onSetDate={(date) => setDate(date)}
+              renderDay={renderDay} 
+              date={currentDate}
+              lookAhead={lookAhead} 
+              isActive={true} />
+        </div>
 
-        <div style={{display: 'flex', flexDirection: size.width < 1150 ? 'column' : 'row', width: '100%', height: size.width < 1150 ? '100%' : '50%'}}>
-          <div style={{ width: size.width < 1150 ? '100%' : '60%', height: size.width < 1150 ? '50%' : '100%' }}>
+        <div style={lowerSection}>
+          <div style={mapContainerStyle}>
             <Map prefix={"main"} 
-                currentEvents={filteredEvents} 
-                selectedEvents={selectedEvents}
+                events={mappedEvents}
                 onSelection={onMapSelection} 
                 isActive={true}
                 windowSize={size} />
           </div>
-          <div style={{ width: size.width < 1150 ? '100%' : '40%', height: size.width < 1150 ? '50%' : '100%' }}>
+          <div style={listContainerStyle}>
             <List prefix={"main"} 
-              events={selectedEvents.length ? selectedEvents : filteredEvents} 
+              events={mappedEvents}
               onItemClick={item => window.open(item.link)}
               isActive={true} />
           </div>

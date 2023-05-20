@@ -28,14 +28,31 @@ async function getEvents() {
     let events = await new Promise((resolve, _) => {
         reader(
             readerOptions, 
-            results => resolve(results.map((item, idx) => ({ 
-                ...item, description: [item.description, loremIpsum].join('\n'), 
-                link: "https://www.instagram.com/e.s.d.a/",
-                tags: parseTags(item), coordinates: parseCoords(item), id: idx }))),
-            _ => resolve(fallbackEvents.map((item, idx) => ({ 
-                ...item, 
-                tags: parseTags(item), coordinates: parseCoords(item), id: idx })))
-        );
+            results => resolve(results.map((item, id) => {
+                const tags = parseTags(item);
+                const coordinates = parseCoords(item);
+
+                const getType = (tags) => {
+                    if (tags.indexOf('#battle') !== -1) {
+                        return 'battle';
+                    } else if (tags.indexOf('#camp') !== -1) {
+                        return 'camp';
+                    } else if (tags.indexOf('#lab') !== -1) {
+                        return 'lab';
+                    }
+
+                    return 'unknown';
+                };
+
+                const type = getType(tags);
+
+                return {
+                    ...item, description: [item.description, loremIpsum].join('\n'), 
+                    link: "https://www.instagram.com/e.s.d.a/",
+                    tags, coordinates, id, type
+                };
+            }),
+            _ => resolve(fallbackEvents)));
     });
 
     return events;

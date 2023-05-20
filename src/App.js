@@ -96,13 +96,15 @@ const App = ({ events }) => {
     const dayEvents = filteredEvents.filter(ev => isEventInDay(ev, date));
     const isSelected = selection.filter(selectedDate => selectedDate.getTime() === date.getTime()).length;
     const cellColor = isSelected ? 'green' : (dayEvents.length ? 'blue' : 'white');
+    const fontColor = isSelected ? 'white' : (dayEvents.length ? 'white' : 'black');
     const dayStyle = { 
       display: 'flex', 
       flexDirection: 'column',
       justifyContent: 'center', 
       textAlign:'center',
       width: '100%', 
-      height: '100%', 
+      height: '100%',
+      color: fontColor,
       backgroundColor: cellColor, 
       border: isCurrentDay(date) ? '2px solid red' : 'solid grey 1px', 
       borderRadius: '4px'
@@ -126,8 +128,8 @@ const App = ({ events }) => {
   const isSmall = size.width < 1150;
   const mapContainerStyle = { width: isSmall ? '100%' : '60%', height: isSmall ? '50%' : '100%', [isSmall ? 'marginBottom' : 'marginRight']: '1px' };
   const listContainerStyle = { width: isSmall ? '100%' : '40%', height: isSmall ? '50%' : '100%', [isSmall ? 'marginTop' : 'marginLeft']: '1px' };
-  const upperSection = { width: '100%', height: '50%', marginBottom: '1px' };
-  const lowerSection = { display: 'flex', flexDirection: isSmall ? 'column' : 'row', width: '100%', height: isSmall ? '100%' : '50%', marginTop: '1px' };
+  const upperSection = { width: '100%', height: '40%', marginBottom: '1px' };
+  const lowerSection = { display: 'flex', flexDirection: isSmall ? 'column' : 'row', width: '100%', height: isSmall ? '100%' : '60%', marginTop: '1px' };
 
   const isEventSelected = (event) => {
     return selectedEvents.some(ev => ev.id === event.id);

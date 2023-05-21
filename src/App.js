@@ -1,103 +1,107 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { add, format, parse } from 'date-fns'
+import React, { useCallback, useEffect, useState } from 'react';
+import { add, format, parse } from 'date-fns';
 
-import './App.css'
+import './App.css';
 
-import Calendar from './Calendar'
-import List from './List'
-import Map from './Map'
-import FilterControl from './FilterControl'
+import Calendar from './Calendar';
+import List from './List';
+import Map from './Map';
+import FilterControl from './FilterControl';
 
-import { isEventInDay } from './Utils/EventUtils'
-import { isCurrentDay, getFirstDayOfMonth } from './Utils/TimeUtils'
-import { useWindowSize } from './Utils/ReactUtils'
+import { isEventInDay } from './Utils/EventUtils';
+import {
+    isCurrentDay,
+    getFirstDayOfMonth,
+    getCalendarDays,
+} from './Utils/TimeUtils';
+import { useWindowSize } from './Utils/ReactUtils';
 
-import { Button } from 'react-bootstrap'
-import { AiOutlineClear } from 'react-icons/ai'
+import { Button } from 'react-bootstrap';
+import { AiOutlineClear } from 'react-icons/ai';
 
 const App = ({ events }) => {
-    const size = useWindowSize()
-    const [currentDate, setDate] = useState(new Date())
+    const size = useWindowSize();
+    const [currentDate, setDate] = useState(new Date());
 
-    const [filteredEvents, setFilteredEvents] = useState([])
-    const [selectedEvents, setSelectedEvents] = useState([])
+    const [filteredEvents, setFilteredEvents] = useState([]);
+    const [selectedEvents, setSelectedEvents] = useState([]);
 
-    const [selection, setDaysSelection] = useState([])
-    const [tagsFilter, setTagsFilter] = useState([])
-    const [chosenTags, setChosenTags] = useState([])
+    const [selection, setDaysSelection] = useState([]);
+    const [tagsFilter, setTagsFilter] = useState([]);
+    const [chosenTags, setChosenTags] = useState([]);
 
     const getTimeRangedEvents = (events, currentDate) => {
-        const lastMonth = add(currentDate, { months: 3 })
+        const lastMonth = add(currentDate, { months: 3 });
         const timeRange = [
             getFirstDayOfMonth(
                 currentDate.getFullYear(),
                 currentDate.getMonth()
             ),
             getFirstDayOfMonth(lastMonth.getFullYear(), lastMonth.getMonth()),
-        ]
+        ];
 
         return events.filter((event) => {
-            const date = parse(event.date, 'dd-MM-yyyy', new Date())
-            return date >= timeRange[0] && date < timeRange[1]
-        })
-    }
+            const date = parse(event.date, 'dd-MM-yyyy', new Date());
+            return date >= timeRange[0] && date < timeRange[1];
+        });
+    };
 
     useEffect(() => {
-        setFilteredEvents(getTimeRangedEvents(events, currentDate))
+        setFilteredEvents(getTimeRangedEvents(events, currentDate));
 
         const allTags = events.reduce(
             (acc, ev) => new Set([...new Set(ev.tags), ...acc]),
             new Set()
-        )
-        setTagsFilter([...allTags])
-    }, [events, currentDate])
+        );
+        setTagsFilter([...allTags]);
+    }, [events, currentDate]);
 
     const onCalendarSelection = (e, dates) => {
-        const isAdd = e.ctrlKey || e.metaKey
+        const isAdd = e.ctrlKey || e.metaKey;
 
-        const newSelection = isAdd ? selection.concat(dates) : dates
+        const newSelection = isAdd ? selection.concat(dates) : dates;
         const newItems = events.filter((event) =>
             newSelection.some((day) => isEventInDay(event, day))
-        )
+        );
 
-        setDaysSelection(newSelection)
-        setSelectedEvents(newItems)
-    }
+        setDaysSelection(newSelection);
+        setSelectedEvents(newItems);
+    };
 
     const onMapSelection = useCallback(
         (event) => {
-            const { originalEvent, features } = event
-            const isAdd = originalEvent.ctrlKey || originalEvent.metaKey
+            const { originalEvent, features } = event;
+            const isAdd = originalEvent.ctrlKey || originalEvent.metaKey;
 
             const newEvents = features.map(({ properties }) => ({
                 ...properties,
                 tags: eval(properties.tags),
                 coordinates: eval(properties.coordinates),
-            }))
+            }));
 
             const newSelection = isAdd
                 ? [...selectedEvents, ...newEvents]
-                : newEvents
+                : newEvents;
             const newItems = newSelection.reduce((acc, event) => {
-                const eventDate = parse(event.date, 'dd-MM-yyyy', new Date())
+                const eventDate = parse(event.date, 'dd-MM-yyyy', new Date());
                 const alreadyHas = acc.some(
                     (date) => date.getTime() === eventDate.getTime()
-                )
-                return alreadyHas ? acc : [...acc, eventDate]
-            }, [])
+                );
+                return alreadyHas ? acc : [...acc, eventDate];
+            }, []);
 
-            setDaysSelection(newItems)
-            setSelectedEvents(newSelection)
+            setDaysSelection(newItems);
+            setSelectedEvents(newSelection);
         },
         [selectedEvents]
-    )
+    );
 
     const onClearSelection = (_) => {
-        setChosenTags([])
-        setDaysSelection([])
-        setSelectedEvents([])
-        setFilteredEvents(getTimeRangedEvents(events, currentDate))
-    }
+        setChosenTags([]);
+        setDaysSelection([]);
+        setSelectedEvents([]);
+        setFilteredEvents(getTimeRangedEvents(events, currentDate));
+    };
 
     const onSetTagFilter = (tag) => {
         const newChosenTags = [
@@ -105,10 +109,10 @@ const App = ({ events }) => {
                 ...chosenTags.filter((t) => [tag].indexOf(t) === -1),
                 ...[tag].filter((t) => chosenTags.indexOf(t) === -1),
             ]),
-        ]
-        const timeRangedEvents = getTimeRangedEvents(events, currentDate)
+        ];
+        const timeRangedEvents = getTimeRangedEvents(events, currentDate);
 
-        setChosenTags(newChosenTags)
+        setChosenTags(newChosenTags);
         setFilteredEvents(
             newChosenTags.length
                 ? timeRangedEvents.filter((event) =>
@@ -117,24 +121,24 @@ const App = ({ events }) => {
                       )
                   )
                 : timeRangedEvents
-        )
-    }
+        );
+    };
 
     const renderDay = (date) => {
-        const dayEvents = filteredEvents.filter((ev) => isEventInDay(ev, date))
+        const dayEvents = filteredEvents.filter((ev) => isEventInDay(ev, date));
         const isSelected = selection.filter(
             (selectedDate) => selectedDate.getTime() === date.getTime()
-        ).length
+        ).length;
         const cellColor = isSelected
             ? '#E8AA42'
             : dayEvents.length
             ? '#025464'
-            : 'white'
+            : 'white';
         const fontColor = isSelected
             ? 'white'
             : dayEvents.length
             ? 'white'
-            : 'black'
+            : 'black';
         const dayStyle = {
             display: 'flex',
             flexDirection: 'column',
@@ -148,60 +152,100 @@ const App = ({ events }) => {
                 ? '2px solid #E57C23'
                 : 'solid #d3d4d5 1px',
             borderRadius: '4px',
-        }
+        };
 
         return (
             <div style={dayStyle}>
                 <div> {format(date, 'd')} </div>
             </div>
-        )
-    }
+        );
+    };
+
+    const renderHeader = (date, item, weekDayIdx) => {
+        const weekdayInMonth = getCalendarDays(date).filter(
+            (day) =>
+                day.getMonth() === date.getMonth() &&
+                day.getDay() === weekDayIdx
+        );
+
+        const selectedWeekdaysOfMonth = selection.filter(
+            (day) =>
+                day.getMonth() === date.getMonth() &&
+                day.getDay() === weekDayIdx
+        );
+
+        const isSelected =
+            weekdayInMonth.length === selectedWeekdaysOfMonth.length;
+
+        const cellColor = isSelected ? '#E8AA42' : 'white';
+        const fontColor = isSelected ? 'white' : 'black';
+
+        return (
+            <div
+                key={`header-${item}`}
+                style={{
+                    height: '100%',
+                    width: '100%',
+                    textAlign: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    border: 'solid #d3d4d5 1px',
+                    borderRadius: '4px',
+                    color: fontColor,
+                    backgroundColor: cellColor,
+                }}
+            >
+                {item}
+            </div>
+        );
+    };
 
     const countLookAhead = (size) => {
-        if (size.width < 800) return 1
-        if (size.width < 1150) return 2
+        if (size.width < 800) return 1;
+        if (size.width < 1150) return 2;
 
-        return 3
-    }
-    const lookAhead = countLookAhead(size)
+        return 3;
+    };
+    const lookAhead = countLookAhead(size);
 
-    const isSmall = size.width < 1150
+    const isSmall = size.width < 1150;
     const mapContainerStyle = {
         width: isSmall ? '100%' : '60%',
         height: isSmall ? '50%' : '100%',
         [isSmall ? 'marginBottom' : 'marginRight']: '1px',
-    }
+    };
     const listContainerStyle = {
         width: isSmall ? '100%' : '40%',
         height: isSmall ? '50%' : '100%',
         [isSmall ? 'marginTop' : 'marginLeft']: '1px',
-    }
-    const upperSection = { width: '100%', height: '40%', marginBottom: '1px' }
+    };
+    const upperSection = { width: '100%', height: '40%', marginBottom: '1px' };
     const lowerSection = {
         display: 'flex',
         flexDirection: isSmall ? 'column' : 'row',
         width: '100%',
         height: isSmall ? '100%' : '60%',
         marginTop: '1px',
-    }
+    };
 
     const isEventSelected = (event) => {
-        return selectedEvents.some((ev) => ev.id === event.id)
-    }
+        return selectedEvents.some((ev) => ev.id === event.id);
+    };
 
     const mappedEvents = filteredEvents.map((ev) => ({
         ...ev,
         isSelected: isEventSelected(ev),
-    }))
+    }));
     mappedEvents.sort((lhs, rhs) => {
         if (isEventSelected(lhs) && !isEventSelected(rhs)) {
-            return -1
+            return -1;
         } else if (isEventSelected(rhs) && isEventSelected(lhs)) {
-            return 1
+            return 1;
         }
 
-        return 0
-    })
+        return 0;
+    });
 
     return (
         <div className="App">
@@ -236,6 +280,7 @@ const App = ({ events }) => {
                         onSelection={onCalendarSelection}
                         onSetDate={(date) => setDate(date)}
                         renderDay={renderDay}
+                        renderHeader={renderHeader}
                         date={currentDate}
                         lookAhead={lookAhead}
                         isActive={true}
@@ -263,7 +308,7 @@ const App = ({ events }) => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default App
+export default App;

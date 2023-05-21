@@ -1,18 +1,18 @@
-import './List.css'
+import './List.css';
 
-import Tag from '../Tag'
-import { useState } from 'react'
-import { BsInstagram } from 'react-icons/bs'
+import Tag from '../Tag';
+import { useState } from 'react';
+import { BsInstagram } from 'react-icons/bs';
 
 function ListItem({ item, isSelected, onClick }) {
-    const [isCollapsed, setCollapsed] = useState(true)
+    const [isCollapsed, setCollapsed] = useState(true);
 
     const rootItemStyle = {
         display: 'inline-block',
         flexDirection: 'column',
         backgroundColor: isSelected ? '#d3d4d5' : 'white',
         borderRadius: isCollapsed ? '4px' : '4px 4px 0 0',
-    }
+    };
 
     const itemPreview = {
         height: '100%',
@@ -20,7 +20,7 @@ function ListItem({ item, isSelected, onClick }) {
         flexDirection: 'row',
         justifyContent: 'space-between',
         cursor: 'pointer',
-    }
+    };
 
     const itemTitleStyle = {
         padding: '10px',
@@ -29,7 +29,7 @@ function ListItem({ item, isSelected, onClick }) {
         justifyContent: 'space-between',
         height: '100%',
         width: '100%',
-    }
+    };
 
     const itemDescriptionStyle = {
         display: 'block',
@@ -37,7 +37,7 @@ function ListItem({ item, isSelected, onClick }) {
         height: isCollapsed ? '0px' : 'fit-content',
         backgroundColor: isSelected ? '#d3d4d5' : 'white',
         borderRadius: '0 0 4px 4px',
-    }
+    };
 
     return (
         <div className="Item Element" style={rootItemStyle}>
@@ -90,15 +90,15 @@ function ListItem({ item, isSelected, onClick }) {
                 <div style={{ padding: '0 5px' }}>{item.description}</div>
             </div>
         </div>
-    )
+    );
 }
 
 function List({ prefix, events, onItemClick, isActive }) {
     const onClickHandler = (event, item) => {
-        onItemClick(item)
-        event.preventDefault()
-        event.stopPropagation()
-    }
+        onItemClick(item);
+        event.preventDefault();
+        event.stopPropagation();
+    };
 
     const groupedEvents = events.reduce(
         (acc, event) =>
@@ -106,7 +106,7 @@ function List({ prefix, events, onItemClick, isActive }) {
                 ? { ...acc, selected: [...acc.selected, event] }
                 : { ...acc, rest: [...acc.rest, event] },
         { selected: [], rest: [] }
-    )
+    );
 
     return (
         <div
@@ -130,7 +130,7 @@ function List({ prefix, events, onItemClick, isActive }) {
                 />
             ))}
         </div>
-    )
+    );
 }
 
-export default List
+export default List;

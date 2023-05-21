@@ -1,17 +1,17 @@
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect, useState } from 'react';
 
 const usePrevious = (value) => {
-    const ref = useRef()
+    const ref = useRef();
     useEffect(() => {
-        ref.current = value
-    })
-    return ref.current
-}
+        ref.current = value;
+    });
+    return ref.current;
+};
 
 export const useHasChanged = (val) => {
-    const prevVal = usePrevious(val)
-    return prevVal !== val
-}
+    const prevVal = usePrevious(val);
+    return prevVal !== val;
+};
 
 export function useWindowSize() {
     // Initialize state with undefined width/height so server and client renders match
@@ -19,7 +19,7 @@ export function useWindowSize() {
     const [windowSize, setWindowSize] = useState({
         width: undefined,
         height: undefined,
-    })
+    });
 
     useEffect(() => {
         // Handler to call on window resize
@@ -28,18 +28,18 @@ export function useWindowSize() {
             setWindowSize({
                 width: window.innerWidth,
                 height: window.innerHeight,
-            })
+            });
         }
 
         // Add event listener
-        window.addEventListener('resize', handleResize)
+        window.addEventListener('resize', handleResize);
 
         // Call handler right away so state gets updated with initial window size
-        handleResize()
+        handleResize();
 
         // Remove event listener on cleanup
-        return () => window.removeEventListener('resize', handleResize)
-    }, []) // Empty array ensures that effect is only run on mount
+        return () => window.removeEventListener('resize', handleResize);
+    }, []); // Empty array ensures that effect is only run on mount
 
-    return windowSize
+    return windowSize;
 }

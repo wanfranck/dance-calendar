@@ -1,4 +1,4 @@
-import './Popup.css'
+import './Popup.css';
 
 function Popup({ isShow, content, onClose }) {
     return (
@@ -6,13 +6,13 @@ function Popup({ isShow, content, onClose }) {
             className={`Popup ${isShow ? 'PopupOpened' : ''}`}
             onClick={(event) => {
                 if (event.target === event.currentTarget) {
-                    onClose()
+                    onClose();
                 }
             }}
         >
             {content}
         </div>
-    )
+    );
 }
 
-export default Popup
+export default Popup;

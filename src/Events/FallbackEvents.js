@@ -1,3 +1,3 @@
-const events = []
+const events = [];
 
-export default events
+export default events;

@@ -1,22 +1,22 @@
-import { getCalendarDays } from '../Utils/TimeUtils'
-import { format } from 'date-fns'
+import { getCalendarDays } from '../Utils/TimeUtils';
+import { format } from 'date-fns';
 
-const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-export default function Month({ date, onClick, renderDay }) {
-    const calendarDays = getCalendarDays(date)
+export default function Month({ date, onClick, renderDay, renderHeader }) {
+    const calendarDays = getCalendarDays(date);
 
     const onClickHandler = (event, items) => {
-        onClick(event, items)
+        onClick(event, items);
 
         if (event.ctrlKey) {
-            event.preventDefault()
+            event.preventDefault();
         }
-    }
+    };
 
     const days = calendarDays.map((item) => {
-        const isCurrentMonth = item.getMonth() === date.getMonth()
-        const value = isCurrentMonth ? renderDay(item) : ''
+        const isCurrentMonth = item.getMonth() === date.getMonth();
+        const value = isCurrentMonth ? renderDay(item) : '';
 
         return (
             <div
@@ -27,20 +27,20 @@ export default function Month({ date, onClick, renderDay }) {
             >
                 {value}
             </div>
-        )
-    })
+        );
+    });
 
     const weekdays = days.reduce((resultArray, item, index) => {
-        const chunkIndex = Math.floor(index / 7)
+        const chunkIndex = Math.floor(index / 7);
 
         if (!resultArray[chunkIndex]) {
-            resultArray[chunkIndex] = []
+            resultArray[chunkIndex] = [];
         }
 
-        resultArray[chunkIndex].push(item)
+        resultArray[chunkIndex].push(item);
 
-        return resultArray
-    }, [])
+        return resultArray;
+    }, []);
 
     const weeks = weekdays.map((days, weekIndex) => (
         <div
@@ -53,7 +53,7 @@ export default function Month({ date, onClick, renderDay }) {
         >
             {days}
         </div>
-    ))
+    ));
 
     const onHeaderClick = (event, weekDay) => {
         onClickHandler(
@@ -63,8 +63,8 @@ export default function Month({ date, onClick, renderDay }) {
                     day.getMonth() === date.getMonth() &&
                     day.getDay() === weekDay
             )
-        )
-    }
+        );
+    };
 
     const header = (
         <div
@@ -78,37 +78,23 @@ export default function Month({ date, onClick, renderDay }) {
                 <div
                     style={{ width: '14%', cursor: 'pointer', padding: '2px' }}
                     key={`header-${idx}`}
+                    onClick={(event) => onHeaderClick(event, (idx + 1) % 7)}
+                    onContextMenu={(event) =>
+                        onHeaderClick(event, (idx + 1) % 7)
+                    }
                 >
-                    <div
-                        key={`header-${item}`}
-                        style={{
-                            height: '100%',
-                            width: '100%',
-                            textAlign: 'center',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            border: 'solid #d3d4d5 1px',
-                            borderRadius: '4px',
-                        }}
-                        onClick={(event) => onHeaderClick(event, (idx + 1) % 7)}
-                        onContextMenu={(event) =>
-                            onHeaderClick(event, (idx + 1) % 7)
-                        }
-                    >
-                        {item}
-                    </div>
+                    {renderHeader(date, item, (idx + 1) % 7)}
                 </div>
             ))}
         </div>
-    )
+    );
 
     const onMonthClick = (event) => {
         onClickHandler(
             event,
             calendarDays.filter((day) => day.getMonth() === date.getMonth())
-        )
-    }
+        );
+    };
 
     const fullSize = {
         width: '100%',
@@ -116,7 +102,7 @@ export default function Month({ date, onClick, renderDay }) {
         display: 'flex',
         flexDirection: 'column',
         margin: '0px 10px',
-    }
+    };
     const monthStyle = {
         display: 'flex',
         flexDirection: 'column',
@@ -125,7 +111,7 @@ export default function Month({ date, onClick, renderDay }) {
         textAlign: 'center',
         border: 'solid #d3d4d5 1px',
         borderRadius: '4px',
-    }
+    };
     return (
         <div style={fullSize} key={`month-${date.getTime()}`}>
             <div style={{ height: '12%', padding: '2px' }}>
@@ -142,5 +128,5 @@ export default function Month({ date, onClick, renderDay }) {
             {header}
             {weeks}
         </div>
-    )
+    );
 }

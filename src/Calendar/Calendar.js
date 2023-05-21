@@ -1,13 +1,13 @@
-import React from 'react'
+import React from 'react';
 
-import './Calendar.css'
+import './Calendar.css';
 
-import Month from './Month'
+import Month from './Month';
 
-import { add, sub } from 'date-fns'
+import { add, sub } from 'date-fns';
 
-import { AiOutlineRight, AiOutlineLeft } from 'react-icons/ai'
-import { Button } from 'react-bootstrap'
+import { AiOutlineRight, AiOutlineLeft } from 'react-icons/ai';
+import { Button } from 'react-bootstrap';
 
 function Calendar({
     date,
@@ -15,6 +15,7 @@ function Calendar({
     onSelection,
     onSetDate,
     renderDay,
+    renderHeader,
     isActive,
 }) {
     const months = Array.from(new Array(lookAhead))
@@ -24,18 +25,19 @@ function Calendar({
                 key={`month-${idx}`}
                 date={date}
                 renderDay={renderDay}
+                renderHeader={renderHeader}
                 onClick={(event, selection, mode) =>
                     onSelection(event, selection, mode)
                 }
             />
-        ))
+        ));
 
     const buttonStyle = {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
         margin: '2px 0',
-    }
+    };
 
     return (
         <div className={`Calendar ${isActive ? '' : 'Hidden'}`}>
@@ -55,7 +57,7 @@ function Calendar({
                 <AiOutlineRight width="100%" />
             </Button>
         </div>
-    )
+    );
 }
 
-export default Calendar
+export default Calendar;

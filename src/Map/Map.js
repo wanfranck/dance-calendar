@@ -8,6 +8,11 @@ import './Map.css';
 import { bbox, lineString } from '@turf/turf';
 import { battleImage, labImage, trainImage, defaultImage, trainImageSelected, battleImageSelected, labImageSelected, defaultImageSelected } from '../Icons';
 
+import Class from './../Icons/class.png';
+import Battle from './../Icons/battle.png';
+import Lab from './../Icons/lab.png';
+import Unknown from './../Icons/unknown.png';
+
 mapboxgl.accessToken = 'pk.eyJ1IjoiYW50b24tbGFzaGNoYW5rYSIsImEiOiJjbGY1anhha3MwbGpoM3lxaGZmaHM4dWliIn0.JyEoFVACqTIpRpTZzSIFvg';
 
 function sourceFromEvents(events) {
@@ -33,7 +38,7 @@ function Map({ events, isActive, onSelection, prefix, windowSize }) {
 
         map.current = new mapboxgl.Map({
             container: `map-${prefix}`,
-            style: 'mapbox://styles/mapbox/streets-v12',
+            style: 'mapbox://styles/mapbox/light-v11',
             center: [-74.5, 40],
             zoom: 9,
         });
@@ -112,7 +117,27 @@ function Map({ events, isActive, onSelection, prefix, windowSize }) {
     }, [events, isLoaded, isActive]);
 
     return (
-        <div className={`Map ${isActive ? '' : 'Hidden'}`} id={`map-${prefix}`} />
+        <div style={{ width: '100%', height: '100%' }}>
+            <div className={`Map ${isActive ? '' : 'Hidden'}`} id={`map-${prefix}`} />
+            <div id="state-legend" class="legend">
+                <div style={{ display:'flex', justifyContent:'left', gap: '20%' }}>
+                    <div><img src={Class} alt='camp' style={{ width: '15px', height: '15px' }}></img></div>
+                    <div>camp</div>
+                </div>
+                <div style={{ display:'flex', justifyContent:'left', gap: '20%' }}>
+                    <div><img src={Battle} alt='battle' style={{ width: '15px', height: '15px' }}></img></div>
+                    <div>battle</div>
+                </div>
+                <div style={{ display:'flex', justifyContent:'left', gap: '20%' }}>
+                    <div><img src={Lab} alt='lab' style={{ width: '15px', height: '15px' }}></img></div>
+                    <div>lab</div>
+                </div>
+                <div style={{ display:'flex', justifyContent:'left', gap: '20%' }}>
+                    <div><img src={Unknown} alt='unknown' style={{ width: '15px', height: '15px' }}></img></div>
+                    <div>other</div>
+                </div>
+            </div>
+        </div>
     );
 }
 

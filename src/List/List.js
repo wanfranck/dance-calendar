@@ -7,7 +7,7 @@ import { BsInstagram } from 'react-icons/bs';
 function ListItem({ item, isSelected, onClick }) {
     const [isCollapsed, setCollapsed] = useState(true);
 
-    const rootItemStyle = { display: 'inline-block', flexDirection: 'column', backgroundColor: isSelected ? 'grey' : 'white' };
+    const rootItemStyle = { display: 'inline-block', flexDirection: 'column', backgroundColor: isSelected ? '#d3d4d5' : 'white', borderRadius: isCollapsed ? '4px' : '4px 4px 0 0' };
     const itemPreview = { height: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', cursor: 'pointer' };
     const itemTitleStyle = { padding: '10px', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', height: '100%', width: '100%' };
 
@@ -28,7 +28,7 @@ function ListItem({ item, isSelected, onClick }) {
                     </div>
                 </div>
             </div>
-            <div style={{ display: 'block', overflow: 'hidden', height: isCollapsed ? '0px' : 'fit-content', backgroundColor: isSelected ? 'grey' : 'white' }}>
+            <div style={{ display: 'block', overflow: 'hidden', height: isCollapsed ? '0px' : 'fit-content', backgroundColor: isSelected ? '#d3d4d5' : 'white', borderRadius: '0 0 4px 4px' }}>
                 <div style={{ display: 'flex', marginTop: '5px' }}>
                     { item.tags.map((t, idx) => <Tag key={`tag-${idx}`} value={t} />) }
                 </div>

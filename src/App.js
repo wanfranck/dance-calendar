@@ -12,6 +12,9 @@ import { isEventInDay } from './Utils/EventUtils';
 import { isCurrentDay, getFirstDayOfMonth } from './Utils/TimeUtils';
 import { useWindowSize } from './Utils/ReactUtils';
 
+import { Button } from 'react-bootstrap';
+import { AiOutlineClear } from 'react-icons/ai';
+
 const App = ({ events }) => {
   const size = useWindowSize();
   const [currentDate, setDate] = useState(new Date());
@@ -95,7 +98,7 @@ const App = ({ events }) => {
   const renderDay = (date) => {
     const dayEvents = filteredEvents.filter(ev => isEventInDay(ev, date));
     const isSelected = selection.filter(selectedDate => selectedDate.getTime() === date.getTime()).length;
-    const cellColor = isSelected ? 'green' : (dayEvents.length ? 'blue' : 'white');
+    const cellColor = isSelected ? '#E8AA42' : (dayEvents.length ? '#025464' : 'white');
     const fontColor = isSelected ? 'white' : (dayEvents.length ? 'white' : 'black');
     const dayStyle = { 
       display: 'flex', 
@@ -106,13 +109,13 @@ const App = ({ events }) => {
       height: '100%',
       color: fontColor,
       backgroundColor: cellColor, 
-      border: isCurrentDay(date) ? '2px solid red' : 'solid grey 1px', 
+      border: isCurrentDay(date) ? '2px solid #E57C23' : 'solid #d3d4d5 1px', 
       borderRadius: '4px'
     };
     
     return (
       <div style={dayStyle}>
-        <p> { format(date, "d") } </p>
+        <div> { format(date, "d") } </div>
       </div>
     );
   }
@@ -148,13 +151,18 @@ const App = ({ events }) => {
 
   return (
     <div className="App">
-      <div className="NavigationBar" style={{ justifyContent:'space-between' }}>
+      <div className="NavigationBar" style={{ gap: '2px' }}>
         <div style={{ display:'flex' }}>
           <FilterControl date={currentDate} 
                          tags={tagsFilter.map((tag) => ({ value: tag, isActive: chosenTags.indexOf(tag) !== -1 }))} 
                          onChangeDate={d => setDate(d)} 
                          onChangeFilter={tag => onSetTagFilter(tag)}
                          onClearSelection={onClearSelection} />
+        </div>
+        <div>
+            <Button variant="light" style={{ height: '100%' }} onClick={event => onClearSelection(event)}>
+                <AiOutlineClear width='100%' height='100%' />
+            </Button>
         </div>
       </div>
 

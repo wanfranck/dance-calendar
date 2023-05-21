@@ -1,2 +1,2 @@
-import DateController from "./DateController";
-export default DateController;
+import DateController from './DateController'
+export default DateController

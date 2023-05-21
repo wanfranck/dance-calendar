@@ -1,2 +1,2 @@
-import getEvents from "./Events";
-export default getEvents;
+import getEvents from './Events'
+export default getEvents

@@ -1,44 +1,43 @@
 #root {
-  width: 100vw;
-  height: 100vh;  
+    width: 100vw;
+    height: 100vh;
 }
 
 .App {
-  width: 80%;
-  height: 90%;
-  margin: auto;
+    width: 80%;
+    height: 90%;
+    margin: auto;
 }
 
 .Container {
-  background-color: white;
-  position: relative;
-  width: 100%;
-  height: 95%;
+    background-color: white;
+    position: relative;
+    width: 100%;
+    height: 95%;
 }
 
 .NavigationBar {
-  display: flex;
-  width: 100%;
-  height: 5%;
+    display: flex;
+    width: 100%;
+    height: 5%;
 }
 
 .Horizontal {
-  display: flex;
-
+    display: flex;
 }
 
 .ViewController {
-  gap: 3px;
+    gap: 3px;
 }
 
-.Switcher { 
-  height: 90%;
+.Switcher {
+    height: 90%;
 }
 
 .Mirrored {
-  transform: scaleX(-1);
+    transform: scaleX(-1);
 }
 
 .Hidden {
-  visibility: hidden;
+    visibility: hidden;
 }

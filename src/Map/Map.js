@@ -119,7 +119,7 @@ function Map({ events, isActive, onSelection, prefix, windowSize }) {
     return (
         <div style={{ width: '100%', height: '100%' }}>
             <div className={`Map ${isActive ? '' : 'Hidden'}`} id={`map-${prefix}`} />
-            <div id="state-legend" class="legend">
+            <div id="state-legend" className="legend">
                 <div style={{ display:'flex', justifyContent:'left', gap: '20%' }}>
                     <div><img src={Class} alt='camp' style={{ width: '15px', height: '15px' }}></img></div>
                     <div>camp</div>

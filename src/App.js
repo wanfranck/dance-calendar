@@ -152,17 +152,17 @@ const App = ({ events }) => {
   return (
     <div className="App">
       <div className="NavigationBar" style={{ gap: '2px' }}>
+        <div>
+            <Button variant="light" style={{ height: '100%' }} onClick={event => onClearSelection(event)}>
+                <AiOutlineClear width='100%' height='100%' />
+            </Button>
+        </div>
         <div style={{ display:'flex' }}>
           <FilterControl date={currentDate} 
                          tags={tagsFilter.map((tag) => ({ value: tag, isActive: chosenTags.indexOf(tag) !== -1 }))} 
                          onChangeDate={d => setDate(d)} 
                          onChangeFilter={tag => onSetTagFilter(tag)}
                          onClearSelection={onClearSelection} />
-        </div>
-        <div>
-            <Button variant="light" style={{ height: '100%' }} onClick={event => onClearSelection(event)}>
-                <AiOutlineClear width='100%' height='100%' />
-            </Button>
         </div>
       </div>
 

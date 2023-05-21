@@ -52,7 +52,7 @@ export default function Month({ date, onClick, renderDay }) {
     const header = 
         <div style={{display: 'flex', justifyContent: 'space-between', height: '12%' }}>
             { daysOfWeek.map((item, idx) => 
-                <div style={{ width: '14%', cursor: 'pointer', padding: '2px' }}>
+                <div style={{ width: '14%', cursor: 'pointer', padding: '2px' }} key={`header-${idx}`}>
                     <div key={`header-${item}`} style={{ height: '100%', width: '100%', textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center', border: 'solid #d3d4d5 1px', borderRadius: '4px' }}
                         onClick={event => onHeaderClick(event, (idx + 1) % 7)}
                         onContextMenu={event => onHeaderClick(event, (idx + 1) % 7)} >
@@ -69,7 +69,7 @@ export default function Month({ date, onClick, renderDay }) {
     const fullSize = { width: '100%', height: '100%', display: 'flex', flexDirection: 'column', margin: '0px 10px' };
     const monthStyle = { display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%', textAlign: 'center', border: 'solid #d3d4d5 1px', borderRadius: '4px' };
     return (
-        <div style={fullSize}>
+        <div style={fullSize} key={`month-${date.getTime()}`}>
             <div style={{ height: '12%', padding: '2px' }}>
                 <div onClick={event => onMonthClick(event)} onContextMenu={event => onMonthClick(event)} style={monthStyle}>
                     <div style={{ display: 'contents', width: 'fit-content' }}>{ format(date, 'MMMM') }</div>

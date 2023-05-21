@@ -16,6 +16,7 @@ function Calendar({
     onSetDate,
     renderDay,
     renderHeader,
+    renderTitle,
     isActive,
 }) {
     const months = Array.from(new Array(lookAhead))
@@ -26,6 +27,7 @@ function Calendar({
                 date={date}
                 renderDay={renderDay}
                 renderHeader={renderHeader}
+                renderTitle={renderTitle}
                 onClick={(event, selection, mode) =>
                     onSelection(event, selection, mode)
                 }

@@ -59,7 +59,23 @@ const App = ({ events }) => {
     const onCalendarSelection = (e, dates) => {
         const isAdd = e.ctrlKey || e.metaKey;
 
-        const newSelection = isAdd ? selection.concat(dates) : dates;
+        const alreadySelectedDates = dates.filter((d) =>
+            selection.some((sd) => sd.getTime() === d.getTime())
+        );
+        const appearedDates = dates.filter((d) =>
+            selection.every((sd) => sd.getTime() !== d.getTime())
+        );
+
+        const newSelection = isAdd
+            ? appearedDates.length
+                ? selection.concat(appearedDates)
+                : selection.filter(
+                      (d) =>
+                          !alreadySelectedDates.some(
+                              (sd) => sd.getTime() === d.getTime()
+                          )
+                  )
+            : dates;
         const newItems = events.filter((event) =>
             newSelection.some((day) => isEventInDay(event, day))
         );
@@ -201,6 +217,38 @@ const App = ({ events }) => {
         );
     };
 
+    const renderTitle = (date) => {
+        console.log('renderTitle', date);
+        const monthDays = getCalendarDays(date).filter(
+            (d) => d.getMonth() === date.getMonth()
+        );
+        const monthDaysInSelection = monthDays.filter((d) =>
+            selection.some((md) => md.getTime() === d.getTime())
+        );
+        const isSelected = monthDaysInSelection.length === monthDays.length;
+
+        console.log(monthDays.length, monthDaysInSelection.length, isSelected);
+
+        const cellColor = isSelected ? '#E8AA42' : 'white';
+        const fontColor = isSelected ? 'white' : 'black';
+
+        return (
+            <div
+                style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: cellColor,
+                    color: fontColor,
+                }}
+            >
+                <div>{format(date, 'MMMM')}</div>
+            </div>
+        );
+    };
+
     const countLookAhead = (size) => {
         if (size.width < 800) return 1;
         if (size.width < 1150) return 2;
@@ -281,6 +329,7 @@ const App = ({ events }) => {
                         onSetDate={(date) => setDate(date)}
                         renderDay={renderDay}
                         renderHeader={renderHeader}
+                        renderTitle={renderTitle}
                         date={currentDate}
                         lookAhead={lookAhead}
                         isActive={true}

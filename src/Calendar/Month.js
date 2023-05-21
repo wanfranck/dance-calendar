@@ -1,9 +1,15 @@
 import { getCalendarDays } from '../Utils/TimeUtils';
-import { format } from 'date-fns';
+// import { format } from 'date-fns';
 
 const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-export default function Month({ date, onClick, renderDay, renderHeader }) {
+export default function Month({
+    date,
+    onClick,
+    renderDay,
+    renderHeader,
+    renderTitle,
+}) {
     const calendarDays = getCalendarDays(date);
 
     const onClickHandler = (event, items) => {
@@ -120,9 +126,7 @@ export default function Month({ date, onClick, renderDay, renderHeader }) {
                     onContextMenu={(event) => onMonthClick(event)}
                     style={monthStyle}
                 >
-                    <div style={{ display: 'contents', width: 'fit-content' }}>
-                        {format(date, 'MMMM')}
-                    </div>
+                    {renderTitle(date)}
                 </div>
             </div>
             {header}

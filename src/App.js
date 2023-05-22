@@ -22,6 +22,7 @@ import { AiOutlineClear } from 'react-icons/ai';
 const App = ({ events }) => {
     const size = useWindowSize();
     const [currentDate, setDate] = useState(new Date());
+    const [currentLocation, setLocation] = useState({ lat: 53.961161, lon: 27.659521 });
 
     const [filteredEvents, setFilteredEvents] = useState([]);
     const [selectedEvents, setSelectedEvents] = useState([]);
@@ -29,6 +30,13 @@ const App = ({ events }) => {
     const [selection, setDaysSelection] = useState([]);
     const [tagsFilter, setTagsFilter] = useState([]);
     const [chosenTags, setChosenTags] = useState([]);
+
+    useEffect(() => {
+        navigator.geolocation.getCurrentPosition((position) => {
+            const { latitude, longitude } = position.coords;
+            setLocation({ lat: latitude, lon: longitude });
+        });
+    }, []);
 
     const getTimeRangedEvents = (events, currentDate) => {
         const lastMonth = add(currentDate, { months: 3 });
@@ -218,7 +226,6 @@ const App = ({ events }) => {
     };
 
     const renderTitle = (date) => {
-        console.log('renderTitle', date);
         const monthDays = getCalendarDays(date).filter(
             (d) => d.getMonth() === date.getMonth()
         );
@@ -226,8 +233,6 @@ const App = ({ events }) => {
             selection.some((md) => md.getTime() === d.getTime())
         );
         const isSelected = monthDaysInSelection.length === monthDays.length;
-
-        console.log(monthDays.length, monthDaysInSelection.length, isSelected);
 
         const cellColor = isSelected ? '#E8AA42' : 'white';
         const fontColor = isSelected ? 'white' : 'black';
@@ -344,6 +349,7 @@ const App = ({ events }) => {
                             onSelection={onMapSelection}
                             isActive={true}
                             windowSize={size}
+                            location={currentLocation}
                         />
                     </div>
                     <div style={listContainerStyle}>

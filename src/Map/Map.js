@@ -5,7 +5,6 @@ import { useEffect } from 'react';
 import 'mapbox-gl/src/css/mapbox-gl.css';
 import './Map.css';
 
-import { bbox, lineString } from '@turf/turf';
 import {
     battleImage,
     labImage,
@@ -37,7 +36,7 @@ function sourceFromEvents(events) {
     };
 }
 
-function Map({ events, isActive, onSelection, prefix, windowSize }) {
+function Map({ events, location, isActive, onSelection, prefix, windowSize }) {
     const map = useRef(null);
     const [isLoaded, setLoaded] = useState(false);
 
@@ -53,7 +52,7 @@ function Map({ events, isActive, onSelection, prefix, windowSize }) {
         map.current = new mapboxgl.Map({
             container: `map-${prefix}`,
             style: 'mapbox://styles/mapbox/light-v11',
-            center: [-74.5, 40],
+            center: location,
             zoom: 9,
         });
 
@@ -121,26 +120,17 @@ function Map({ events, isActive, onSelection, prefix, windowSize }) {
         const source = map.current.getSource('events');
         const sourceData = sourceFromEvents(events);
         source.setData(sourceData);
-
-        if (!events.length) return;
-
-        if (events.length > 1) {
-            const bboxInput = sourceData;
-            const deltas = [-1e-3, -1e-3, 1e-3, 1e-3];
-            const bboxData = bbox(
-                lineString(
-                    bboxInput.features.map((f) => f.geometry.coordinates)
-                )
-            ).map((coord, idx) => coord + deltas[idx]);
-            map.current.fitBounds(bboxData);
-        } else if (events.length === 1) {
-            map.current.flyTo({
-                center: events[0].coordinates,
-                essential: true,
-                zoom: 12,
-            });
-        }
     }, [events, isLoaded, isActive]);
+
+    useEffect(() => {
+        if (!isLoaded) return;
+
+        map.current.flyTo({
+            center: location,
+            essential: true,
+            zoom: 12,
+        });
+    }, [location, isLoaded, isActive]);
 
     return (
         <div style={{ width: '100%', height: '100%' }}>

@@ -99,8 +99,10 @@ const App = ({ events }) => {
 
             const newEvents = features.map(({ properties }) => ({
                 ...properties,
+                /* eslint-disable */
                 tags: eval(properties.tags),
                 coordinates: eval(properties.coordinates),
+                /* eslint-enable */
             }));
 
             const newSelection = isAdd

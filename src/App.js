@@ -19,6 +19,8 @@ import { useWindowSize } from './Utils/ReactUtils';
 import { Button } from 'react-bootstrap';
 import { AiOutlineClear } from 'react-icons/ai';
 
+import { isMobile } from 'react-device-detect';
+
 const App = ({ events }) => {
     const size = useWindowSize();
     const [currentDate, setDate] = useState(new Date());
@@ -268,7 +270,7 @@ const App = ({ events }) => {
     const mapContainerStyle = {
         width: isSmall ? '100%' : '60%',
         height: isSmall ? '50%' : '100%',
-        [isSmall ? 'marginBottom' : 'marginRight']: '1px',
+        margin: isMobile ? '0 0 10px 0' : '1px 0 0 0'
     };
     const listContainerStyle = {
         width: isSmall ? '100%' : '40%',
@@ -281,7 +283,7 @@ const App = ({ events }) => {
         flexDirection: isSmall ? 'column' : 'row',
         width: '100%',
         height: isSmall ? '100%' : '60%',
-        marginTop: '1px',
+        margin: '1px 0 0 0'
     };
 
     const isEventSelected = (event) => {
@@ -304,7 +306,7 @@ const App = ({ events }) => {
 
     return (
         <div className="App">
-            <div className="NavigationBar" style={{ gap: '2px' }}>
+            <div className="NavigationBar" style={{ gap: '2px', marginBottom: '4px' }}>
                 <div>
                     <Button
                         variant="light"

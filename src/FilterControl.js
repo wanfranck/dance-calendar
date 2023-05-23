@@ -4,12 +4,14 @@ import { Button, OverlayTrigger, Popover, Form } from 'react-bootstrap';
 
 import Tag from './Tag';
 
+import { isMobile } from 'react-device-detect';
+
 export default function FilterControl({ tags, onChangeFilter }) {
     const popover = (
         <Popover
             style={{
                 maxWidth: '100%',
-                width: '30%',
+                width: isMobile ? '70%' : '30%',
                 inset: '15px 15px 15px 15px',
             }}
         >
@@ -47,7 +49,7 @@ export default function FilterControl({ tags, onChangeFilter }) {
     );
 
     return (
-        <OverlayTrigger trigger="focus" placement="right" overlay={popover}>
+        <OverlayTrigger trigger="click" placement={isMobile ? "bottom" : "right"} overlay={popover}>
             <Button variant="light">
                 <AiTwotoneFilter width="100%" height="100%" />
             </Button>

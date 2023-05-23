@@ -107,7 +107,6 @@ export default function Month({
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        margin: '0px 10px',
     };
     const monthStyle = {
         display: 'flex',

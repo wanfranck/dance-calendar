@@ -128,12 +128,12 @@ function Map({ events, location, isActive, onSelection, prefix, windowSize }) {
         map.current.flyTo({
             center: location,
             essential: true,
-            zoom: 12,
+            zoom: 9,
         });
     }, [location, isLoaded, isActive]);
 
     return (
-        <div style={{ width: '100%', height: '100%' }}>
+        <div style={{ width: '100%', height: '100%', border: 'solid #d3d4d5 1px', borderRadius: '4px' }}>
             <div
                 className={`Map ${isActive ? '' : 'Hidden'}`}
                 id={`map-${prefix}`}

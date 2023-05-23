@@ -11,7 +11,7 @@ function ListItem({ item, isSelected, onClick }) {
         display: 'inline-block',
         flexDirection: 'column',
         backgroundColor: isSelected ? '#d3d4d5' : 'white',
-        borderRadius: isCollapsed ? '4px' : '4px 4px 0 0',
+        borderRadius: isCollapsed ? '4px' : '4px 4px 0 0'
     };
 
     const itemPreview = {
@@ -23,7 +23,7 @@ function ListItem({ item, isSelected, onClick }) {
     };
 
     const itemTitleStyle = {
-        padding: '10px',
+        padding: '2px 10px',
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -112,6 +112,7 @@ function List({ prefix, events, onItemClick, isActive }) {
         <div
             key={`list-${prefix}`}
             className={`List ${isActive ? '' : 'Hidden'}`}
+            style={{ border: 'solid #d3d4d5 1px', borderRadius: '4px', padding: '2px' }}
         >
             {groupedEvents.selected.map((item, idx) => (
                 <ListItem

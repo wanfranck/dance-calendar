@@ -92,6 +92,8 @@ const App = ({ events }) => {
         setSelectedEvents(newItems);
     };
 
+    console.log("ALOha");
+
     const onMapSelection = useCallback(
         (event) => {
             const { originalEvent, features } = event;

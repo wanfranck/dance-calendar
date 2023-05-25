@@ -125,10 +125,8 @@ function Map({ events, location, isActive, onSelection, prefix, windowSize }) {
     useEffect(() => {
         if (!isLoaded) return;
 
-        const loc = { lat: location.lat, lng: location.lng };
-
         map.current.flyTo({
-            center: loc,
+            center: location,
             essential: true,
             zoom: location.zoom,
         });

@@ -11,7 +11,9 @@ function ListItem({ item, isSelected, onClick }) {
         display: 'inline-block',
         flexDirection: 'column',
         backgroundColor: isSelected ? '#d3d4d5' : 'white',
-        borderRadius: isCollapsed ? '4px' : '4px 4px 0 0'
+        borderRadius: isCollapsed ? '4px' : '4px 4px 0 0',
+        border: 'solid #d3d4d5',
+        borderWidth: '0 0 1px 0',
     };
 
     const itemPreview = {
@@ -37,6 +39,8 @@ function ListItem({ item, isSelected, onClick }) {
         height: isCollapsed ? '0px' : 'fit-content',
         backgroundColor: isSelected ? '#d3d4d5' : 'white',
         borderRadius: '0 0 4px 4px',
+        border: 'solid #d3d4d5',
+        borderWidth: '0 0 1px 0',
     };
 
     return (
@@ -48,7 +52,12 @@ function ListItem({ item, isSelected, onClick }) {
                 <div style={{ display: 'flex' }}>
                     <img
                         alt="Item"
-                        style={{ height: '100%', objectFit: 'contain' }}
+                        style={{
+                            height: '100%',
+                            objectFit: 'contain',
+                            border: 'solid #d3d4d5',
+                            borderWidth: '0 1px 0 0',
+                        }}
                         src={item.image}
                     />
 
@@ -59,15 +68,24 @@ function ListItem({ item, isSelected, onClick }) {
                                 width: '100%',
                                 display: 'flex',
                                 flexDirection: 'column',
+                                justifyContent: 'space-around',
                             }}
                         >
-                            <div style={{ height: '33%' }}> {item.title} </div>
-                            <div style={{ height: '33%' }}>
-                                <b> {item.date} </b>
+                            <div style={{ maxHeight: '70%' }}>
+                                <div
+                                    style={{
+                                        height: '1.4rem',
+                                        overflow: 'hidden',
+                                    }}
+                                >
+                                    {item.title}
+                                </div>
+                                <div style={{ height: '33%' }}>
+                                    <b> {item.date} </b>
+                                </div>
                             </div>
                             <div
                                 style={{
-                                    height: '33%',
                                     display: 'flex',
                                     flexDirection: 'column',
                                     justifyContent: 'center',
@@ -112,7 +130,11 @@ function List({ prefix, events, onItemClick, isActive }) {
         <div
             key={`list-${prefix}`}
             className={`List ${isActive ? '' : 'Hidden'}`}
-            style={{ border: 'solid #d3d4d5 1px', borderRadius: '4px', padding: '2px' }}
+            style={{
+                border: 'solid #d3d4d5 1px',
+                borderRadius: '4px',
+                padding: '2px',
+            }}
         >
             {groupedEvents.selected.map((item, idx) => (
                 <ListItem

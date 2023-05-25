@@ -24,7 +24,12 @@ import { isMobile } from 'react-device-detect';
 const App = ({ events }) => {
     const size = useWindowSize();
     const [currentDate, setDate] = useState(new Date());
-    const [currentLocation, setLocation] = useState({ lat: 53.961161, lon: 27.659521 });
+    const [currentLocation, setLocation] = useState({
+        lat: 45.60007662094233,
+        lng: 10.709870250868335,
+        zoom: 3,
+        isUserLocation: false,
+    });
 
     const [filteredEvents, setFilteredEvents] = useState([]);
     const [selectedEvents, setSelectedEvents] = useState([]);
@@ -36,7 +41,12 @@ const App = ({ events }) => {
     useEffect(() => {
         navigator.geolocation.getCurrentPosition((position) => {
             const { latitude, longitude } = position.coords;
-            setLocation({ lat: latitude, lon: longitude });
+            setLocation({
+                lat: latitude,
+                lng: longitude,
+                zoom: 11,
+                isUserLocation: true,
+            });
         });
     }, []);
 
@@ -67,7 +77,7 @@ const App = ({ events }) => {
     }, [events, currentDate]);
 
     const onCalendarSelection = (e, dates) => {
-        const isAdd = e.ctrlKey || e.metaKey;
+        const isAdd = isMobile || e.ctrlKey || e.metaKey;
 
         const alreadySelectedDates = dates.filter((d) =>
             selection.some((sd) => sd.getTime() === d.getTime())
@@ -97,7 +107,8 @@ const App = ({ events }) => {
     const onMapSelection = useCallback(
         (event) => {
             const { originalEvent, features } = event;
-            const isAdd = originalEvent.ctrlKey || originalEvent.metaKey;
+            const isAdd =
+                isMobile || originalEvent.ctrlKey || originalEvent.metaKey;
 
             const newEvents = features.map(({ properties }) => ({
                 ...properties,
@@ -107,8 +118,21 @@ const App = ({ events }) => {
                 /* eslint-enable */
             }));
 
+            const allIsSelected = newEvents.every((event) => event.isSelected);
+
+            console.log(newEvents, 'allIsSelected', allIsSelected);
+
             const newSelection = isAdd
-                ? [...selectedEvents, ...newEvents]
+                ? allIsSelected
+                    ? selectedEvents.filter((event) =>
+                          newEvents.every((e) => e.id !== event.id)
+                      )
+                    : [
+                          ...selectedEvents,
+                          ...newEvents.filter((event) =>
+                              selectedEvents.every((e) => e.id !== event.id)
+                          ),
+                      ]
                 : newEvents;
             const newItems = newSelection.reduce((acc, event) => {
                 const eventDate = parse(event.date, 'dd-MM-yyyy', new Date());
@@ -270,7 +294,7 @@ const App = ({ events }) => {
     const mapContainerStyle = {
         width: isSmall ? '100%' : '60%',
         height: isSmall ? '50%' : '100%',
-        margin: isMobile ? '0 0 10px 0' : '1px 0 0 0'
+        margin: isMobile ? '0 0 10px 0' : '1px 0 0 0',
     };
     const listContainerStyle = {
         width: isSmall ? '100%' : '40%',
@@ -283,7 +307,7 @@ const App = ({ events }) => {
         flexDirection: isSmall ? 'column' : 'row',
         width: '100%',
         height: isSmall ? '100%' : '60%',
-        margin: '1px 0 0 0'
+        margin: '1px 0 0 0',
     };
 
     const isEventSelected = (event) => {
@@ -306,7 +330,10 @@ const App = ({ events }) => {
 
     return (
         <div className="App">
-            <div className="NavigationBar" style={{ gap: '2px', marginBottom: '4px' }}>
+            <div
+                className="NavigationBar"
+                style={{ gap: '2px', marginBottom: '4px' }}
+            >
                 <div>
                     <Button
                         variant="light"

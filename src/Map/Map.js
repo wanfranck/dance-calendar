@@ -125,15 +125,30 @@ function Map({ events, location, isActive, onSelection, prefix, windowSize }) {
     useEffect(() => {
         if (!isLoaded) return;
 
+        const loc = { lat: location.lat, lng: location.lng };
+
         map.current.flyTo({
-            center: location,
+            center: loc,
             essential: true,
-            zoom: 9,
+            zoom: location.zoom,
         });
+
+        if (location.isUserLocation) {
+            new mapboxgl.Marker({ color: 'red' })
+                .setLngLat(loc)
+                .addTo(map.current);
+        }
     }, [location, isLoaded, isActive]);
 
     return (
-        <div style={{ width: '100%', height: '100%', border: 'solid #d3d4d5 1px', borderRadius: '4px' }}>
+        <div
+            style={{
+                width: '100%',
+                height: '100%',
+                border: 'solid #d3d4d5 1px',
+                borderRadius: '4px',
+            }}
+        >
             <div
                 className={`Map ${isActive ? '' : 'Hidden'}`}
                 id={`map-${prefix}`}

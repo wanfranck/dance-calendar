@@ -133,7 +133,7 @@ function Map({ events, location, isActive, onSelection, prefix, windowSize }) {
 
         if (location.isUserLocation) {
             new mapboxgl.Marker({ color: 'red' })
-                .setLngLat(loc)
+                .setLngLat(location)
                 .addTo(map.current);
         }
     }, [location, isLoaded, isActive]);

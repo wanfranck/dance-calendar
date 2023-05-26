@@ -21,6 +21,8 @@ import { AiOutlineClear } from 'react-icons/ai';
 
 import { isMobile } from 'react-device-detect';
 
+import logoImg from './Icons/logo.png';
+
 const App = ({ events }) => {
     const size = useWindowSize();
     const [currentDate, setDate] = useState(new Date());
@@ -294,7 +296,7 @@ const App = ({ events }) => {
     const mapContainerStyle = {
         width: isSmall ? '100%' : '60%',
         height: isSmall ? '50%' : '100%',
-        margin: isMobile ? '0 0 10px 0' : '1px 0 0 0',
+        margin: isMobile || lookAhead < 3 ? '0 0 10px 0' : '1px 0 0 0',
     };
     const listContainerStyle = {
         width: isSmall ? '100%' : '40%',
@@ -334,6 +336,7 @@ const App = ({ events }) => {
                 className="NavigationBar"
                 style={{ gap: '2px', marginBottom: '4px' }}
             >
+                <img src={logoImg} alt={'Application Logo'} />
                 <div>
                     <Button
                         variant="light"

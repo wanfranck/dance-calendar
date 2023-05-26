@@ -54,7 +54,7 @@ function List({ prefix, events, onItemClick }) {
     const items = groupedEvents.selected
         .map((item, idx) => (
             <ListItem
-                key={`list-item-${idx}`}
+                key={`list-item-${item.id}`}
                 isSelected={item.isSelected}
                 item={item}
                 onClick={(event, item) => onClickHandler(event, item)}
@@ -63,7 +63,7 @@ function List({ prefix, events, onItemClick }) {
         .concat(
             groupedEvents.rest.map((item, idx) => (
                 <ListItem
-                    key={`list-item-${idx}`}
+                    key={`list-item-${item.id}`}
                     isSelected={item.isSelected}
                     item={item}
                     onClick={(event, item) => onClickHandler(event, item)}
@@ -75,7 +75,11 @@ function List({ prefix, events, onItemClick }) {
     const chunkSize = 2;
     for (let i = 0; i < items.length; i += chunkSize) {
         const chunk = items.slice(i, i + chunkSize);
-        rows.push(<div className="Row">{chunk}</div>);
+        rows.push(
+            <div key={`row-${i}`} className="Row">
+                {chunk}
+            </div>
+        );
     }
 
     return (

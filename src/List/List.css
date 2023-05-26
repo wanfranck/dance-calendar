@@ -3,11 +3,58 @@
     width: 100%;
     height: 100%;
     overflow-y: scroll;
+    float: left;
+    border: solid #d3d4d5 1px;
+    border-radius: 4px;
+}
+
+.Row {
+    display: flex;
+    flex-direction: row;
+    height: 40%;
+    width: 100%;
 }
 
 .Element {
     display: inline-block;
-    height: 20%;
-    width: 100%;
+    width: 50%;
+    height: 100%;
     background-color: white;
+    border: solid #d3d4d5 1px;
+}
+
+.image {
+    opacity: 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+    transition: 0.5s ease;
+    backface-visibility: hidden;
+    object-fit: cover;
+}
+
+.middle {
+    transition: 0.5s ease;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    bottom: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0);
+    color: rgba(0, 0, 0, 0);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.Element:hover .image {
+    opacity: 0.3;
+}
+
+.Element:hover .middle {
+    background-color: rgba(255, 255, 255, 0.4);
+    color: rgba(0, 0, 0, 1);
 }

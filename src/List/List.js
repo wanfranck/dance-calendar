@@ -1,117 +1,42 @@
 import './List.css';
 
-import Tag from '../Tag';
-import { useState } from 'react';
 import { BsInstagram } from 'react-icons/bs';
 
 function ListItem({ item, isSelected, onClick }) {
-    const [isCollapsed, setCollapsed] = useState(true);
-
     const rootItemStyle = {
         display: 'inline-block',
         flexDirection: 'column',
+        borderRadius: '4px',
+        border: 'solid',
+        borderWidth: isSelected ? '2px' : '1px',
+        borderColor: isSelected ? '#E8AA42' : '#d3d4d5',
         backgroundColor: isSelected ? '#d3d4d5' : 'white',
-        borderRadius: isCollapsed ? '4px' : '4px 4px 0 0',
-        border: 'solid #d3d4d5',
-        borderWidth: '0 0 1px 0',
-    };
-
-    const itemPreview = {
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        cursor: 'pointer',
-    };
-
-    const itemTitleStyle = {
-        padding: '2px 10px',
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        height: '100%',
-        width: '100%',
-    };
-
-    const itemDescriptionStyle = {
-        display: 'block',
-        overflow: 'hidden',
-        height: isCollapsed ? '0px' : 'fit-content',
-        backgroundColor: isSelected ? '#d3d4d5' : 'white',
-        borderRadius: '0 0 4px 4px',
-        border: 'solid #d3d4d5',
-        borderWidth: '0 0 1px 0',
     };
 
     return (
         <div className="Item Element" style={rootItemStyle}>
-            <div
-                style={itemPreview}
-                onClick={(_) => setCollapsed(!isCollapsed)}
-            >
-                <div style={{ display: 'flex' }}>
-                    <img
-                        alt="Item"
+            <img alt="Item Logo" className="image" src={item.image} />
+            <div className="middle">
+                <div style={{ fontSize: '20px', fontWeight: '500' }}>
+                    <div>{item.title}</div>
+                    <div style={{ fontWeight: '600' }}>{item.date}</div>
+                </div>
+                <div>
+                    <BsInstagram
                         style={{
-                            height: '100%',
-                            objectFit: 'contain',
-                            border: 'solid #d3d4d5',
-                            borderWidth: '0 1px 0 0',
+                            width: '35px',
+                            height: '35px',
+                            cursor: 'pointer',
                         }}
-                        src={item.image}
+                        onClick={(event) => onClick(event, item)}
                     />
-
-                    <div style={itemTitleStyle}>
-                        <div
-                            style={{
-                                height: '100%',
-                                width: '100%',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                justifyContent: 'space-around',
-                            }}
-                        >
-                            <div style={{ maxHeight: '70%' }}>
-                                <div
-                                    style={{
-                                        height: '1.4rem',
-                                        overflow: 'hidden',
-                                    }}
-                                >
-                                    {item.title}
-                                </div>
-                                <div style={{ height: '33%' }}>
-                                    <b> {item.date} </b>
-                                </div>
-                            </div>
-                            <div
-                                style={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <BsInstagram
-                                    onClick={(event) => onClick(event, item)}
-                                />
-                            </div>
-                        </div>
-                    </div>
                 </div>
-            </div>
-            <div style={itemDescriptionStyle}>
-                <div style={{ display: 'flex', marginTop: '5px' }}>
-                    {item.tags.map((t, idx) => (
-                        <Tag key={`tag-${idx}`} value={t} />
-                    ))}
-                </div>
-                <div style={{ padding: '0 5px' }}>{item.description}</div>
             </div>
         </div>
     );
 }
 
-function List({ prefix, events, onItemClick, isActive }) {
+function List({ prefix, events, onItemClick }) {
     const onClickHandler = (event, item) => {
         onItemClick(item);
         event.preventDefault();
@@ -126,32 +51,36 @@ function List({ prefix, events, onItemClick, isActive }) {
         { selected: [], rest: [] }
     );
 
+    const items = groupedEvents.selected
+        .map((item, idx) => (
+            <ListItem
+                key={`list-item-${idx}`}
+                isSelected={item.isSelected}
+                item={item}
+                onClick={(event, item) => onClickHandler(event, item)}
+            />
+        ))
+        .concat(
+            groupedEvents.rest.map((item, idx) => (
+                <ListItem
+                    key={`list-item-${idx}`}
+                    isSelected={item.isSelected}
+                    item={item}
+                    onClick={(event, item) => onClickHandler(event, item)}
+                />
+            ))
+        );
+
+    let rows = [];
+    const chunkSize = 2;
+    for (let i = 0; i < items.length; i += chunkSize) {
+        const chunk = items.slice(i, i + chunkSize);
+        rows.push(<div className="Row">{chunk}</div>);
+    }
+
     return (
-        <div
-            key={`list-${prefix}`}
-            className={`List ${isActive ? '' : 'Hidden'}`}
-            style={{
-                border: 'solid #d3d4d5 1px',
-                borderRadius: '4px',
-                padding: '2px',
-            }}
-        >
-            {groupedEvents.selected.map((item, idx) => (
-                <ListItem
-                    key={`list-item-${idx}`}
-                    isSelected={item.isSelected}
-                    item={item}
-                    onClick={(event, item) => onClickHandler(event, item)}
-                />
-            ))}
-            {groupedEvents.rest.map((item, idx) => (
-                <ListItem
-                    key={`list-item-${idx}`}
-                    isSelected={item.isSelected}
-                    item={item}
-                    onClick={(event, item) => onClickHandler(event, item)}
-                />
-            ))}
+        <div key={`list-${prefix}`} className={`List`}>
+            {rows}
         </div>
     );
 }

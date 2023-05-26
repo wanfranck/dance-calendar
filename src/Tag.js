@@ -8,7 +8,7 @@ export default function Tag({ value, isActive, onClick }) {
 
     const tagStyle = {
         width: 'fit-content',
-        fontSize: '10px',
+        fontSize: '12px',
         fontWeight: 'bold',
         border: '1px solid #d3d4d5',
         borderRadius: '3px',

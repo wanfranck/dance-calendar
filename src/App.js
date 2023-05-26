@@ -334,30 +334,40 @@ const App = ({ events }) => {
         <div className="App">
             <div
                 className="NavigationBar"
-                style={{ gap: '2px', marginBottom: '4px' }}
+                style={{
+                    gap: '2px',
+                    marginBottom: '4px',
+                    justifyContent: 'space-between',
+                }}
             >
-                <img src={logoImg} alt={'Application Logo'} />
-                <div>
-                    <Button
-                        variant="light"
-                        style={{ height: '100%' }}
-                        onClick={(event) => onClearSelection(event)}
-                    >
-                        <AiOutlineClear width="100%" height="100%" />
-                    </Button>
-                </div>
                 <div style={{ display: 'flex' }}>
-                    <FilterControl
-                        date={currentDate}
-                        tags={tagsFilter.map((tag) => ({
-                            value: tag,
-                            isActive: chosenTags.indexOf(tag) !== -1,
-                        }))}
-                        onChangeDate={(d) => setDate(d)}
-                        onChangeFilter={(tag) => onSetTagFilter(tag)}
-                        onClearSelection={onClearSelection}
-                    />
+                    <div style={{ marginRight: '5px' }}>
+                        <FilterControl
+                            date={currentDate}
+                            tags={tagsFilter.map((tag) => ({
+                                value: tag,
+                                isActive: chosenTags.indexOf(tag) !== -1,
+                            }))}
+                            onChangeDate={(d) => setDate(d)}
+                            onChangeFilter={(tag) => onSetTagFilter(tag)}
+                            onClearSelection={onClearSelection}
+                        />
+                    </div>
+                    <div>
+                        <Button
+                            variant="light"
+                            style={{ height: '40px', width: '45px' }}
+                            onClick={(event) => onClearSelection(event)}
+                        >
+                            <AiOutlineClear width="100%" height="100%" />
+                        </Button>
+                    </div>
                 </div>
+                <img
+                    src={logoImg}
+                    style={{ height: '40px', width: '40px' }}
+                    alt={'Application Logo'}
+                />
             </div>
 
             <div className="Container">

@@ -14,18 +14,17 @@
     position: relative;
     width: 100%;
     height: 95%;
-    top: 6%;
+    top: 50px;
 }
 
 .NavigationBar {
     position: fixed;
-    width: 100%;
-    height: 5%;
+    width: 80%;
     z-index: 1;
     top: 0;
     background-color: white;
     display: flex;
-    padding: 2px;
+    padding: 3px 0 3px 0;
 }
 
 .Horizontal {
@@ -46,4 +45,12 @@
 
 .Hidden {
     visibility: hidden;
+}
+
+.desktop-hack {
+    margin-left: 10%;
+}
+
+.desktop-hack .popover-arrow {
+    margin-left: -33%;
 }

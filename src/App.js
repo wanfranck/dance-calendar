@@ -302,6 +302,7 @@ const App = ({ events }) => {
         width: isSmall ? '100%' : '40%',
         height: isSmall ? '50%' : '100%',
         [isSmall ? 'marginTop' : 'marginLeft']: '1px',
+        marginBottom: lookAhead < 3 ? '10px' : '0',
     };
     const upperSection = { width: '100%', height: '40%', marginBottom: '1px' };
     const lowerSection = {

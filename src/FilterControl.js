@@ -6,13 +6,12 @@ import Tag from './Tag';
 
 import { isMobile } from 'react-device-detect';
 
-export default function FilterControl({ tags, onChangeFilter }) {
+export default function FilterControl({ tags, onChangeFilter, width }) {
     const popover = (
         <Popover
-            className={`${isMobile ? '' : 'desktop-hack'}`}
             style={{
                 maxWidth: '100%',
-                width: isMobile ? '97%' : '30%',
+                width: isMobile ? '97%' : width,
             }}
             body
         >
@@ -54,6 +53,7 @@ export default function FilterControl({ tags, onChangeFilter }) {
         </Popover>
     );
 
+    const isFilterApplied = tags.some((t) => t.isActive);
     return (
         <OverlayTrigger
             rootClose
@@ -61,19 +61,25 @@ export default function FilterControl({ tags, onChangeFilter }) {
             placement="bottom"
             overlay={popover}
         >
-            {({ ref, ...triggerHandler }) => (
-                <Button
-                    variant="light"
-                    style={{ height: '40px', width: '45px' }}
-                    {...triggerHandler}
-                    ref={ref}
-                >
-                    <AiTwotoneFilter width="100%" height="100%" />
-                </Button>
-            )}
-            {/* <Button variant="light" style={{ height: '40px', width: '45px' }}>
+            <Button variant="light" style={{ height: '40px', width: '45px' }}>
+                {isFilterApplied ? (
+                    <div
+                        style={{
+                            width: '10px',
+                            height: '10px',
+                            borderRadius: '5px',
+                            backgroundColor: '#E8AA42',
+                            position: 'absolute',
+                            left: '5px',
+                            top: '7px',
+                            zIndex: 3,
+                        }}
+                    ></div>
+                ) : (
+                    <div></div>
+                )}
                 <AiTwotoneFilter width="100%" height="100%" />
-            </Button> */}
+            </Button>
         </OverlayTrigger>
     );
 }

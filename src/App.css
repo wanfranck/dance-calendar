@@ -46,11 +46,3 @@
 .Hidden {
     visibility: hidden;
 }
-
-.desktop-hack {
-    margin-left: 10%;
-}
-
-.desktop-hack .popover-arrow {
-    margin-left: -33%;
-}

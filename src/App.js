@@ -331,6 +331,8 @@ const App = ({ events }) => {
         return 0;
     });
 
+    const filterWidths = ['80%', '60%', '40%'];
+
     return (
         <div className="App">
             <div
@@ -349,9 +351,8 @@ const App = ({ events }) => {
                                 value: tag,
                                 isActive: chosenTags.indexOf(tag) !== -1,
                             }))}
-                            onChangeDate={(d) => setDate(d)}
                             onChangeFilter={(tag) => onSetTagFilter(tag)}
-                            onClearSelection={onClearSelection}
+                            width={filterWidths[lookAhead - 1]}
                         />
                     </div>
                     <div>

@@ -36,6 +36,18 @@ function sourceFromEvents(events) {
     };
 }
 
+const getImage = (prefix) => [
+    'match',
+    ['get', 'type'],
+    'camp',
+    `train-image${prefix}`,
+    'battle',
+    `battle-image${prefix}`,
+    'lab',
+    `lab-image${prefix}`,
+    `default-image${prefix}`,
+];
+
 function Map({ events, location, isActive, onSelection, prefix, windowSize }) {
     const map = useRef(null);
     const [isLoaded, setLoaded] = useState(false);
@@ -53,15 +65,10 @@ function Map({ events, location, isActive, onSelection, prefix, windowSize }) {
             container: `map-${prefix}`,
             style: 'mapbox://styles/mapbox/light-v11',
             center: location,
-            zoom: 9,
+            zoom: 3,
         });
 
         map.current.on('load', () => {
-            map.current.addSource('events', {
-                type: 'geojson',
-                data: sourceFromEvents([]),
-            });
-
             map.current.addImage('train-image', trainImage);
             map.current.addImage('train-image-selected', trainImageSelected);
             map.current.addImage('battle-image', battleImage);
@@ -73,34 +80,6 @@ function Map({ events, location, isActive, onSelection, prefix, windowSize }) {
                 'default-image-selected',
                 defaultImageSelected
             );
-
-            const getImage = (prefix) => [
-                'match',
-                ['get', 'type'],
-                'camp',
-                `train-image${prefix}`,
-                'battle',
-                `battle-image${prefix}`,
-                'lab',
-                `lab-image${prefix}`,
-                `default-image${prefix}`,
-            ];
-
-            map.current.addLayer({
-                id: 'events',
-                source: 'events',
-                type: 'symbol',
-                layout: {
-                    'icon-image': [
-                        'case',
-                        ['get', 'isSelected'],
-                        getImage('-selected'),
-                        getImage(''),
-                    ],
-                    'icon-size': 0.4,
-                    'icon-allow-overlap': true,
-                },
-            });
 
             setLoaded(true);
         });
@@ -118,8 +97,38 @@ function Map({ events, location, isActive, onSelection, prefix, windowSize }) {
         if (!isLoaded) return;
 
         const source = map.current.getSource('events');
-        const sourceData = sourceFromEvents(events);
-        source.setData(sourceData);
+        if (events.length) {
+            const sourceData = sourceFromEvents(events);
+            if (!source) {
+                map.current.addSource('events', {
+                    type: 'geojson',
+                    data: sourceData,
+                });
+
+                map.current.addLayer({
+                    id: 'events',
+                    source: 'events',
+                    type: 'symbol',
+                    layout: {
+                        'icon-image': [
+                            'case',
+                            ['get', 'isSelected'],
+                            getImage('-selected'),
+                            getImage(''),
+                        ],
+                        'icon-size': 0.4,
+                        'icon-allow-overlap': true,
+                    },
+                });
+            } else {
+                source.setData(sourceData);
+            }
+        } else {
+            if (source) {
+                map.current.removeLayer('events');
+                map.current.removeSource('events');
+            }
+        }
     }, [events, isLoaded, isActive]);
 
     useEffect(() => {

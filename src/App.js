@@ -17,13 +17,30 @@ import {
 import { useWindowSize } from './Utils/ReactUtils';
 
 import { Button } from 'react-bootstrap';
-import { AiOutlineClear } from 'react-icons/ai';
+import {
+    AiOutlineClear,
+    AiOutlineSend,
+    AiOutlineInfoCircle,
+} from 'react-icons/ai';
 
 import { isMobile } from 'react-device-detect';
 
 import logoImg from './Icons/logo.png';
 
-const App = ({ events }) => {
+const getTimeRangedEvents = (events, currentDate, lookAhead) => {
+    const lastMonth = add(currentDate, { months: lookAhead });
+    const timeRange = [
+        getFirstDayOfMonth(currentDate.getFullYear(), currentDate.getMonth()),
+        getFirstDayOfMonth(lastMonth.getFullYear(), lastMonth.getMonth()),
+    ];
+
+    return events.filter((event) => {
+        const date = parse(event.date, 'dd-MM-yyyy', new Date());
+        return date >= timeRange[0] && date < timeRange[1];
+    });
+};
+
+const App = ({ events, showInfo }) => {
     const size = useWindowSize();
     const [currentDate, setDate] = useState(new Date());
     const [currentLocation, setLocation] = useState({
@@ -40,43 +57,43 @@ const App = ({ events }) => {
     const [tagsFilter, setTagsFilter] = useState([]);
     const [chosenTags, setChosenTags] = useState([]);
 
+    const countLookAhead = (size) => {
+        if (size.width < 800) return 1;
+        if (size.width < 1150) return 2;
+
+        return 3;
+    };
+    const lookAhead = countLookAhead(size);
+
     useEffect(() => {
         navigator.geolocation.getCurrentPosition((position) => {
             const { latitude, longitude } = position.coords;
             setLocation({
                 lat: latitude,
                 lng: longitude,
-                zoom: 11,
+                zoom: 3,
                 isUserLocation: true,
             });
         });
     }, []);
 
-    const getTimeRangedEvents = (events, currentDate) => {
-        const lastMonth = add(currentDate, { months: 3 });
-        const timeRange = [
-            getFirstDayOfMonth(
-                currentDate.getFullYear(),
-                currentDate.getMonth()
-            ),
-            getFirstDayOfMonth(lastMonth.getFullYear(), lastMonth.getMonth()),
-        ];
-
-        return events.filter((event) => {
-            const date = parse(event.date, 'dd-MM-yyyy', new Date());
-            return date >= timeRange[0] && date < timeRange[1];
-        });
-    };
-
     useEffect(() => {
-        setFilteredEvents(getTimeRangedEvents(events, currentDate));
-
         const allTags = events.reduce(
             (acc, ev) => new Set([...new Set(ev.tags), ...acc]),
             new Set()
         );
+
         setTagsFilter([...allTags]);
-    }, [events, currentDate]);
+    }, [events]);
+
+    useEffect(() => {
+        setFilteredEvents(
+            getTimeRangedEvents(events, currentDate, lookAhead).filter(
+                (event) =>
+                    chosenTags.every((tag) => event.tags.indexOf(tag) !== -1)
+            )
+        );
+    }, [events, currentDate, chosenTags, lookAhead]);
 
     const onCalendarSelection = (e, dates) => {
         const isAdd = isMobile || e.ctrlKey || e.metaKey;
@@ -122,8 +139,6 @@ const App = ({ events }) => {
 
             const allIsSelected = newEvents.every((event) => event.isSelected);
 
-            console.log(newEvents, 'allIsSelected', allIsSelected);
-
             const newSelection = isAdd
                 ? allIsSelected
                     ? selectedEvents.filter((event) =>
@@ -154,7 +169,7 @@ const App = ({ events }) => {
         setChosenTags([]);
         setDaysSelection([]);
         setSelectedEvents([]);
-        setFilteredEvents(getTimeRangedEvents(events, currentDate));
+        setFilteredEvents(getTimeRangedEvents(events, currentDate, lookAhead));
     };
 
     const onSetTagFilter = (tag) => {
@@ -164,7 +179,11 @@ const App = ({ events }) => {
                 ...[tag].filter((t) => chosenTags.indexOf(t) === -1),
             ]),
         ];
-        const timeRangedEvents = getTimeRangedEvents(events, currentDate);
+        const timeRangedEvents = getTimeRangedEvents(
+            events,
+            currentDate,
+            lookAhead
+        );
 
         setChosenTags(newChosenTags);
         setFilteredEvents(
@@ -284,14 +303,6 @@ const App = ({ events }) => {
         );
     };
 
-    const countLookAhead = (size) => {
-        if (size.width < 800) return 1;
-        if (size.width < 1150) return 2;
-
-        return 3;
-    };
-    const lookAhead = countLookAhead(size);
-
     const isSmall = size.width < 1150;
     const mapContainerStyle = {
         width: isSmall ? '100%' : '60%',
@@ -365,11 +376,52 @@ const App = ({ events }) => {
                         </Button>
                     </div>
                 </div>
-                <img
-                    src={logoImg}
-                    style={{ height: '40px', width: '40px' }}
-                    alt={'Application Logo'}
-                />
+                <div style={{ display: 'flex' }}>
+                    <div style={{ display: 'flex' }}>
+                        <Button
+                            variant="light"
+                            style={{ height: '40px', width: '45px' }}
+                            onClick={showInfo}
+                        >
+                            <AiOutlineInfoCircle width="100%" height="100%" />
+                        </Button>
+                    </div>
+                    <div style={{ marginLeft: '5px' }}>
+                        <Button
+                            variant="light"
+                            style={{ height: '40px', width: '45px' }}
+                            onClick={(_) =>
+                                window.open(
+                                    'https://forms.gle/8SHYRZjKF89iS3598'
+                                )
+                            }
+                        >
+                            <AiOutlineSend width="100%" height="100%" />
+                        </Button>
+                    </div>
+                    <div style={{ marginLeft: '5px' }}>
+                        <Button
+                            variant="light"
+                            style={{
+                                textAlign: 'center',
+                                height: '40px',
+                                width: '45px',
+                                padding: '0px',
+                            }}
+                            onClick={(_) =>
+                                window.open(
+                                    'https://www.instagram.com/_dance.calendar/'
+                                )
+                            }
+                        >
+                            <img
+                                src={logoImg}
+                                style={{ height: '30px', width: '30px' }}
+                                alt={'Application Logo'}
+                            />
+                        </Button>
+                    </div>
+                </div>
             </div>
 
             <div className="Container">

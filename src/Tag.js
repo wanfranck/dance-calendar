@@ -1,7 +1,7 @@
-export default function Tag({ value, isActive, onClick }) {
+export default function Tag({ value, isActive, isDisabled, onClick }) {
     const style = {
         display: 'inline-block',
-        cursor: 'pointer',
+        cursor: isDisabled ? 'not-allowed' : 'pointer',
         margin: '3px',
         width: 'fit-content',
     };

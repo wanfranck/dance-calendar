@@ -79,7 +79,7 @@ function Root() {
                     style={{
                         position: 'absolute',
                         width: '100%',
-                        height: '100%',
+                        height: isMobile ? '130%' : '100%',
                         backgroundColor: 'rgba(0, 0, 0, 0.5)',
                         zIndex: '3',
                     }}
@@ -88,7 +88,7 @@ function Root() {
                         style={{
                             position: 'relative',
                             width: '80%',
-                            height: '80%',
+                            height: isMobile ? '70%' : '80%',
                             top: '10%',
                             left: '10%',
                             backgroundColor: 'white',

@@ -48,8 +48,9 @@ const getImage = (prefix) => [
     `default-image${prefix}`,
 ];
 
-function Map({ events, location, isActive, onSelection, prefix, windowSize }) {
+function Map({ events, location, isActive, onSelection, prefix, windowSize, hoverLocation }) {
     const map = useRef(null);
+    const hoverMarker = useRef(null);
     const [isLoaded, setLoaded] = useState(false);
 
     useEffect(() => {
@@ -146,6 +147,18 @@ function Map({ events, location, isActive, onSelection, prefix, windowSize }) {
                 .addTo(map.current);
         }
     }, [location, isLoaded, isActive]);
+
+    useEffect(() => {
+        if (!isLoaded) return;
+
+        if (hoverMarker && hoverMarker.current) hoverMarker.current.remove();
+
+        if (hoverLocation) {
+            hoverMarker.current = new mapboxgl.Marker({ color: '#E8AA42' })
+                .setLngLat(hoverLocation)
+                .addTo(map.current);
+        }
+    }, [hoverLocation, isLoaded]);
 
     return (
         <div

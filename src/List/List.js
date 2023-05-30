@@ -5,8 +5,9 @@ import { BsInstagram } from 'react-icons/bs';
 import { useHover } from '../Utils/ReactUtils';
 import { useState } from 'react';
 import { isMobile } from 'react-device-detect';
+import IconButton from '@mui/material/IconButton';
 
-function ListItem({ item, isSelected, onClick }) {
+function ListItem({ item, isSelected, onClick, onHover }) {
     const [hoverRef, isHovered] = useHover();
     const [isHighlighted, setIsHighlighted] = useState(false);
     const showDetails = (!isMobile && isHovered) || (isMobile && isHighlighted);
@@ -27,6 +28,17 @@ function ListItem({ item, isSelected, onClick }) {
     const mobileOnClick = (e) => {
         if (!isMobile) return;
         setIsHighlighted(!isHighlighted);
+        onHover(e, item);
+    };
+
+    const onMouseOverHandler = (event) => {
+        if (isMobile) return;
+        onHover(event, item);
+    };
+
+    const onMouseOutHandler = (event) => {
+        if (isMobile) return;
+        onHover(event, { coordinates: null });
     };
 
     return (
@@ -35,6 +47,8 @@ function ListItem({ item, isSelected, onClick }) {
             className="Item Element"
             style={rootItemStyle}
             onClick={mobileOnClick}
+            onMouseOver={onMouseOverHandler}
+            onMouseOut={onMouseOutHandler}
         >
             <img
                 alt="Item Logo"
@@ -42,25 +56,27 @@ function ListItem({ item, isSelected, onClick }) {
                 src={item.image}
             />
             <div className={`middle ${showDetails ? 'middle-hovered' : ''}`}>
-                <div style={{ fontSize: '20px', fontWeight: '500' }}>
+                <div className="info">
                     <div>{item.title}</div>
-                    <div style={{ fontWeight: '600' }}>{item.date}</div>
+                    <div className="date">{item.date}</div>
                 </div>
-                <div onClick={(event) => onClickHandler(event, item)}>
-                    <BsInstagram
-                        style={{
-                            width: '35px',
-                            height: '35px',
-                            cursor: 'pointer',
-                        }}
-                    />
-                </div>
+                <IconButton
+                    onClick={(event) => onClickHandler(event, item)}
+                    sx={{
+                        maxWidth: 'fit-content',
+                        marginLeft: 'auto',
+                        marginRight: 'auto',
+                        color: 'inherit',
+                    }}
+                >
+                    <BsInstagram className="icon" />
+                </IconButton>
             </div>
         </div>
     );
 }
 
-function List({ prefix, events, onItemClick }) {
+function List({ prefix, events, onItemClick, onHover }) {
     const onClickHandler = (event, item) => {
         onItemClick(item);
         event.preventDefault();
@@ -76,25 +92,16 @@ function List({ prefix, events, onItemClick }) {
     );
 
     const items = groupedEvents.selected
+        .concat(groupedEvents.rest)
         .map((item) => (
             <ListItem
                 key={`list-item-${item.id}`}
                 isSelected={item.isSelected}
                 item={item}
                 onClick={(event, item) => onClickHandler(event, item)}
+                onHover={onHover}
             />
-        ))
-        .concat(
-            groupedEvents.rest.map((item) => (
-                <ListItem
-                    key={`list-item-${item.id}`}
-                    isSelected={item.isSelected}
-                    item={item}
-                    onClick={(event, item) => onClickHandler(event, item)}
-                />
-            ))
-        );
-
+        ));
     let rows = [];
     const chunkSize = 2;
     for (let i = 0; i < items.length; i += chunkSize) {

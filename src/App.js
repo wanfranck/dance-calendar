@@ -56,6 +56,7 @@ const App = ({ events, showInfo }) => {
     const [selection, setDaysSelection] = useState([]);
     const [tagsFilter, setTagsFilter] = useState([]);
     const [chosenTags, setChosenTags] = useState([]);
+    const [hoverLocation, setHoverLocation] = useState(null);
 
     const countLookAhead = (size) => {
         if (size.width < 800) return 1;
@@ -163,6 +164,13 @@ const App = ({ events, showInfo }) => {
             setSelectedEvents(newSelection);
         },
         [selectedEvents]
+    );
+
+    const onListHover = useCallback(
+        (event, item) => {
+            setHoverLocation(item.coordinates);
+        },
+        [setHoverLocation]
     );
 
     const onClearSelection = (_) => {
@@ -448,6 +456,7 @@ const App = ({ events, showInfo }) => {
                             isActive={true}
                             windowSize={size}
                             location={currentLocation}
+                            hoverLocation={hoverLocation}
                         />
                     </div>
                     <div style={listContainerStyle}>
@@ -456,6 +465,7 @@ const App = ({ events, showInfo }) => {
                             events={mappedEvents}
                             onItemClick={(item) => window.open(item.link)}
                             isActive={true}
+                            onHover={onListHover}
                         />
                     </div>
                 </div>

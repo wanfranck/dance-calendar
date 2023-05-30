@@ -82,7 +82,7 @@
     "peerDependencies": {
         "react": "^17.0.0 || ^18.0.0",
         "react-dom": "^17.0.0 || ^18.0.0"
-    },      
+    },
     "scripts": {
         "start": "node scripts/start.js",
         "build": "node scripts/build.js",

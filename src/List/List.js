@@ -7,9 +7,15 @@ import { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import IconButton from '@mui/material/IconButton';
 
-function ListItem({ item, isSelected, onClick, onHover }) {
+function ListItem({
+    item,
+    isSelected,
+    onClick,
+    onHover,
+    isHighlighted,
+    setHighlighted,
+}) {
     const [hoverRef, isHovered] = useHover();
-    const [isHighlighted, setIsHighlighted] = useState(false);
     const showDetails = (!isMobile && isHovered) || (isMobile && isHighlighted);
 
     const onClickHandler = (event, item) => {
@@ -27,7 +33,7 @@ function ListItem({ item, isSelected, onClick, onHover }) {
 
     const mobileOnClick = (e) => {
         if (!isMobile) return;
-        setIsHighlighted(!isHighlighted);
+        setHighlighted();
         onHover(e, item);
     };
 
@@ -77,6 +83,8 @@ function ListItem({ item, isSelected, onClick, onHover }) {
 }
 
 function List({ prefix, events, onItemClick, onHover }) {
+    const [highlightedId, setHighlightedId] = useState(null);
+
     const onClickHandler = (event, item) => {
         onItemClick(item);
         event.preventDefault();
@@ -100,6 +108,10 @@ function List({ prefix, events, onItemClick, onHover }) {
                 item={item}
                 onClick={(event, item) => onClickHandler(event, item)}
                 onHover={onHover}
+                isHighlighted={item.id === highlightedId}
+                setHighlighted={(_) =>
+                    setHighlightedId(item.id === highlightedId ? null : item.id)
+                }
             />
         ));
     let rows = [];

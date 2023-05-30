@@ -8,7 +8,7 @@ import List from './List';
 import Map from './Map';
 import FilterControl from './FilterControl';
 
-import { isEventInDay } from './Utils/EventUtils';
+import { isDayInEventDuration, isEventInDay } from './Utils/EventUtils';
 import {
     isCurrentDay,
     getFirstDayOfMonth,
@@ -26,6 +26,7 @@ import {
 import { isMobile } from 'react-device-detect';
 
 import logoImg from './Icons/logo.png';
+import { duration } from '@mui/material';
 
 const getTimeRangedEvents = (events, currentDate, lookAhead) => {
     const lastMonth = add(currentDate, { months: lookAhead });
@@ -57,6 +58,7 @@ const App = ({ events, showInfo }) => {
     const [tagsFilter, setTagsFilter] = useState([]);
     const [chosenTags, setChosenTags] = useState([]);
     const [hoverLocation, setHoverLocation] = useState(null);
+    const [hoverDuration, setHoverDuration] = useState([]);
 
     const countLookAhead = (size) => {
         if (size.width < 800) return 1;
@@ -169,6 +171,9 @@ const App = ({ events, showInfo }) => {
     const onListHover = useCallback(
         (event, item) => {
             setHoverLocation(item.coordinates);
+            const date = parse(item.date, 'dd-MM-yyyy', new Date());
+            const duration = [new Date(date), add(new Date(date), { weeks: 1 })];
+            setHoverDuration(duration);
         },
         [setHoverLocation]
     );
@@ -205,42 +210,45 @@ const App = ({ events, showInfo }) => {
         );
     };
 
-    const renderDay = (date) => {
-        const dayEvents = filteredEvents.filter((ev) => isEventInDay(ev, date));
-        const isSelected = selection.filter(
-            (selectedDate) => selectedDate.getTime() === date.getTime()
-        ).length;
-        const cellColor = isSelected
-            ? '#E8AA42'
-            : dayEvents.length
-            ? '#025464'
-            : 'white';
-        const fontColor = isSelected
-            ? 'white'
-            : dayEvents.length
-            ? 'white'
-            : 'black';
-        const dayStyle = {
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            textAlign: 'center',
-            width: '100%',
-            height: '100%',
-            color: fontColor,
-            backgroundColor: cellColor,
-            border: isCurrentDay(date)
-                ? '2px solid #E57C23'
-                : 'solid #d3d4d5 1px',
-            borderRadius: '4px',
-        };
+    const renderDay = useCallback(
+        (date) => {
+            const dayEvents = filteredEvents.filter((ev) => isEventInDay(ev, date));
+            const isSelected = selection.filter(
+                (selectedDate) => selectedDate.getTime() === date.getTime()
+            ).length;
 
-        return (
-            <div style={dayStyle}>
-                <div> {format(date, 'd')} </div>
-            </div>
-        );
-    };
+            let cellColor = 'white';
+            let fontColor = 'black';
+
+            if (isSelected || isDayInEventDuration(date, hoverDuration)) {
+                cellColor = '#E8AA42';
+                fontColor = 'white';
+            } else if (dayEvents.length) {
+                cellColor = '#025464';
+                fontColor = 'white';
+            }
+
+            const dayStyle = {
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                textAlign: 'center',
+                width: '100%',
+                height: '100%',
+                color: fontColor,
+                backgroundColor: cellColor,
+                border: isCurrentDay(date)
+                    ? '2px solid #E57C23'
+                    : 'solid #d3d4d5 1px',
+                borderRadius: '4px',
+            };
+    
+            return (
+                <div style={dayStyle}>
+                    <div> {format(date, 'd')} </div>
+                </div>
+            );
+        }, [filteredEvents, selection, hoverDuration]);
 
     const renderHeader = (date, item, weekDayIdx) => {
         const weekdayInMonth = getCalendarDays(date).filter(
@@ -444,6 +452,7 @@ const App = ({ events, showInfo }) => {
                         date={currentDate}
                         lookAhead={lookAhead}
                         isActive={true}
+                        hoverDuration={hoverDuration}
                     />
                 </div>
 

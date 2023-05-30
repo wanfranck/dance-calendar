@@ -24,6 +24,7 @@ function Calendar({
     renderHeader,
     renderTitle,
     isActive,
+    hoverDuration,
 }) {
     const [touchStart, setTouchStart] = useState(null);
     const [touchEnd, setTouchEnd] = useState(null);

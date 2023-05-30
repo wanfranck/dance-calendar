@@ -23,3 +23,10 @@ export function getEventsAfter(events, day) {
         return date >= day;
     });
 }
+/**
+ * check is day in event duration
+ * @param {Date} day 
+ * @param {Array<Date>} duration array of start and end date of event
+ */
+export const isDayInEventDuration = (day, duration) => 
+    duration.length === 2 && day >= duration[0] && day <= duration[1];

@@ -13,7 +13,7 @@ function ListItem({
     onClick,
     onHover,
     isHighlighted,
-    setHighlighted,
+    toggleHighlighted,
 }) {
     const [hoverRef, isHovered] = useHover();
     const showDetails = (!isMobile && isHovered) || (isMobile && isHighlighted);
@@ -33,8 +33,8 @@ function ListItem({
 
     const mobileOnClick = (e) => {
         if (!isMobile) return;
-        setHighlighted();
-        onHover(e, item);
+        toggleHighlighted();
+        onHover(e, isHighlighted ? { coordinates: null } : item);
     };
 
     const onMouseOverHandler = (event) => {
@@ -109,7 +109,7 @@ function List({ prefix, events, onItemClick, onHover }) {
                 onClick={(event, item) => onClickHandler(event, item)}
                 onHover={onHover}
                 isHighlighted={item.id === highlightedId}
-                setHighlighted={(_) =>
+                toggleHighlighted={(_) =>
                     setHighlightedId(item.id === highlightedId ? null : item.id)
                 }
             />

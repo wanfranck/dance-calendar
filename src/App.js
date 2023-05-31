@@ -1,31 +1,28 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { add, format, parse } from 'date-fns';
-
-import './App.css';
-
-import Calendar from './Calendar';
-import List from './List';
-import Map from './Map';
-import FilterControl from './FilterControl';
-
-import { isEventInDay } from './Utils/EventUtils';
-import {
-    isCurrentDay,
-    getFirstDayOfMonth,
-    getCalendarDays,
-} from './Utils/TimeUtils';
-import { useWindowSize } from './Utils/ReactUtils';
-
 import { Button } from 'react-bootstrap';
 import {
     AiOutlineClear,
     AiOutlineSend,
     AiOutlineInfoCircle,
 } from 'react-icons/ai';
-
 import { isMobile } from 'react-device-detect';
 
+import Calendar from './Calendar';
+import List from './List';
+import Map from './Map';
+import FilterControl from './FilterControl';
+import { isDayInEventDuration, isEventInDay } from './Utils/EventUtils';
+import {
+    isCurrentDay,
+    getFirstDayOfMonth,
+    getCalendarDays,
+} from './Utils/TimeUtils';
+import { useWindowSize } from './Utils/ReactUtils';
 import logoImg from './Icons/logo.png';
+import { dateFormat, filterWidths } from './constants';
+
+import './App.css';
 
 const getTimeRangedEvents = (events, currentDate, lookAhead) => {
     const lastMonth = add(currentDate, { months: lookAhead });
@@ -35,7 +32,7 @@ const getTimeRangedEvents = (events, currentDate, lookAhead) => {
     ];
 
     return events.filter((event) => {
-        const date = parse(event.date, 'dd-MM-yyyy', new Date());
+        const date = parse(event.date, dateFormat, new Date());
         return date >= timeRange[0] && date < timeRange[1];
     });
 };
@@ -57,6 +54,7 @@ const App = ({ events, showInfo }) => {
     const [tagsFilter, setTagsFilter] = useState([]);
     const [chosenTags, setChosenTags] = useState([]);
     const [hoverLocation, setHoverLocation] = useState(null);
+    const [hoverDuration, setHoverDuration] = useState([]);
 
     const countLookAhead = (size) => {
         if (size.width < 800) return 1;
@@ -96,33 +94,36 @@ const App = ({ events, showInfo }) => {
         );
     }, [events, currentDate, chosenTags, lookAhead]);
 
-    const onCalendarSelection = (e, dates) => {
-        const isAdd = isMobile || e.ctrlKey || e.metaKey;
+    const onCalendarSelection = useCallback(
+        (e, dates) => {
+            const isAdd = isMobile || e.ctrlKey || e.metaKey;
 
-        const alreadySelectedDates = dates.filter((d) =>
-            selection.some((sd) => sd.getTime() === d.getTime())
-        );
-        const appearedDates = dates.filter((d) =>
-            selection.every((sd) => sd.getTime() !== d.getTime())
-        );
+            const alreadySelectedDates = dates.filter((d) =>
+                selection.some((sd) => sd.getTime() === d.getTime())
+            );
+            const appearedDates = dates.filter((d) =>
+                selection.every((sd) => sd.getTime() !== d.getTime())
+            );
 
-        const newSelection = isAdd
-            ? appearedDates.length
-                ? selection.concat(appearedDates)
-                : selection.filter(
-                      (d) =>
-                          !alreadySelectedDates.some(
-                              (sd) => sd.getTime() === d.getTime()
-                          )
-                  )
-            : dates;
-        const newItems = events.filter((event) =>
-            newSelection.some((day) => isEventInDay(event, day))
-        );
+            const newSelection = isAdd
+                ? appearedDates.length
+                    ? selection.concat(appearedDates)
+                    : selection.filter(
+                          (d) =>
+                              !alreadySelectedDates.some(
+                                  (sd) => sd.getTime() === d.getTime()
+                              )
+                      )
+                : dates;
+            const newItems = events.filter((event) =>
+                newSelection.some((day) => isEventInDay(event, day))
+            );
 
-        setDaysSelection(newSelection);
-        setSelectedEvents(newItems);
-    };
+            setDaysSelection(newSelection);
+            setSelectedEvents(newItems);
+        },
+        [events, selection]
+    );
 
     const onMapSelection = useCallback(
         (event) => {
@@ -153,7 +154,7 @@ const App = ({ events, showInfo }) => {
                       ]
                 : newEvents;
             const newItems = newSelection.reduce((acc, event) => {
-                const eventDate = parse(event.date, 'dd-MM-yyyy', new Date());
+                const eventDate = parse(event.date, dateFormat, new Date());
                 const alreadyHas = acc.some(
                     (date) => date.getTime() === eventDate.getTime()
                 );
@@ -169,6 +170,10 @@ const App = ({ events, showInfo }) => {
     const onListHover = useCallback(
         (event, item) => {
             setHoverLocation(item.coordinates);
+            const date = parse(item.date, dateFormat, new Date());
+            const endDate = parse(item.endDate, dateFormat, new Date());
+            const duration = [date, endDate];
+            setHoverDuration(duration);
         },
         [setHoverLocation]
     );
@@ -205,42 +210,55 @@ const App = ({ events, showInfo }) => {
         );
     };
 
-    const renderDay = (date) => {
-        const dayEvents = filteredEvents.filter((ev) => isEventInDay(ev, date));
-        const isSelected = selection.filter(
-            (selectedDate) => selectedDate.getTime() === date.getTime()
-        ).length;
-        const cellColor = isSelected
-            ? '#E8AA42'
-            : dayEvents.length
-            ? '#025464'
-            : 'white';
-        const fontColor = isSelected
-            ? 'white'
-            : dayEvents.length
-            ? 'white'
-            : 'black';
-        const dayStyle = {
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            textAlign: 'center',
-            width: '100%',
-            height: '100%',
-            color: fontColor,
-            backgroundColor: cellColor,
-            border: isCurrentDay(date)
-                ? '2px solid #E57C23'
-                : 'solid #d3d4d5 1px',
-            borderRadius: '4px',
-        };
+    const renderDay = useCallback(
+        (date) => {
+            const dayEvents = filteredEvents.filter((ev) =>
+                isEventInDay(ev, date)
+            );
+            const isSelected = selection.filter(
+                (selectedDate) => selectedDate.getTime() === date.getTime()
+            ).length;
 
-        return (
-            <div style={dayStyle}>
-                <div> {format(date, 'd')} </div>
-            </div>
-        );
-    };
+            let cellColor = 'white';
+            let fontColor = 'black';
+
+            if (isDayInEventDuration(date, hoverDuration)) {
+                cellColor = '#f2d097';
+                fontColor = '#025464';
+            } else if (isSelected) {
+                cellColor = '#E8AA42';
+                fontColor = 'white';
+            } else if (dayEvents.length) {
+                cellColor = '#025464';
+                fontColor = 'white';
+            }
+
+            const dayStyle = {
+                display: 'flex',
+                position: 'relative',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                textAlign: 'center',
+                width: '100%',
+                height: '100%',
+                color: fontColor,
+                backgroundColor: cellColor,
+                border: isDayInEventDuration(date, hoverDuration)
+                    ? '4px solid #025464'
+                    : isCurrentDay(date)
+                    ? '3px solid #E57C23'
+                    : 'solid #d3d4d5 1px',
+                borderRadius: '4px',
+            };
+
+            return (
+                <div style={dayStyle}>
+                    <div>{format(date, 'd')}</div>
+                </div>
+            );
+        },
+        [filteredEvents, selection, hoverDuration]
+    );
 
     const renderHeader = (date, item, weekDayIdx) => {
         const weekdayInMonth = getCalendarDays(date).filter(
@@ -349,8 +367,6 @@ const App = ({ events, showInfo }) => {
 
         return 0;
     });
-
-    const filterWidths = ['80%', '60%', '40%'];
 
     return (
         <div className="App">

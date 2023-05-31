@@ -1,7 +1,5 @@
 import { getCalendarDays } from '../Utils/TimeUtils';
-// import { format } from 'date-fns';
-
-const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+import { daysOfWeek } from './constants';
 
 export default function Month({
     date,

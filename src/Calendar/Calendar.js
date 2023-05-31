@@ -1,19 +1,13 @@
-import React from 'react';
-
-import './Calendar.css';
+import { useState } from 'react';
+import { add, sub } from 'date-fns';
+import { AiOutlineRight, AiOutlineLeft } from 'react-icons/ai';
+import { Button } from 'react-bootstrap';
+import { BrowserView, MobileView } from 'react-device-detect';
 
 import Month from './Month';
 
-import { add, sub } from 'date-fns';
-
-import { AiOutlineRight, AiOutlineLeft } from 'react-icons/ai';
-import { Button } from 'react-bootstrap';
-
-import { useState } from 'react';
-
-import { BrowserView, MobileView } from 'react-device-detect';
-
-const minSwipeDistance = 50;
+import './Calendar.css';
+import { minSwipeDistance } from './constants';
 
 function Calendar({
     date,

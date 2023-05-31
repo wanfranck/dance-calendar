@@ -1,13 +1,17 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { add, format, parse } from 'date-fns';
-
-import './App.css';
+import { Button } from 'react-bootstrap';
+import {
+    AiOutlineClear,
+    AiOutlineSend,
+    AiOutlineInfoCircle,
+} from 'react-icons/ai';
+import { isMobile } from 'react-device-detect';
 
 import Calendar from './Calendar';
 import List from './List';
 import Map from './Map';
 import FilterControl from './FilterControl';
-
 import { isDayInEventDuration, isEventInDay } from './Utils/EventUtils';
 import {
     isCurrentDay,
@@ -15,18 +19,10 @@ import {
     getCalendarDays,
 } from './Utils/TimeUtils';
 import { useWindowSize } from './Utils/ReactUtils';
-
-import { Button } from 'react-bootstrap';
-import {
-    AiOutlineClear,
-    AiOutlineSend,
-    AiOutlineInfoCircle,
-} from 'react-icons/ai';
-
-import { isMobile } from 'react-device-detect';
-
 import logoImg from './Icons/logo.png';
-import { duration } from '@mui/material';
+import { dateFormat, filterWidths } from './constants';
+
+import './App.css';
 
 const getTimeRangedEvents = (events, currentDate, lookAhead) => {
     const lastMonth = add(currentDate, { months: lookAhead });
@@ -36,7 +32,7 @@ const getTimeRangedEvents = (events, currentDate, lookAhead) => {
     ];
 
     return events.filter((event) => {
-        const date = parse(event.date, 'dd-MM-yyyy', new Date());
+        const date = parse(event.date, dateFormat, new Date());
         return date >= timeRange[0] && date < timeRange[1];
     });
 };
@@ -98,7 +94,7 @@ const App = ({ events, showInfo }) => {
         );
     }, [events, currentDate, chosenTags, lookAhead]);
 
-    const onCalendarSelection = (e, dates) => {
+    const onCalendarSelection = useCallback((e, dates) => {
         const isAdd = isMobile || e.ctrlKey || e.metaKey;
 
         const alreadySelectedDates = dates.filter((d) =>
@@ -124,7 +120,7 @@ const App = ({ events, showInfo }) => {
 
         setDaysSelection(newSelection);
         setSelectedEvents(newItems);
-    };
+    }, [isMobile, selection]);
 
     const onMapSelection = useCallback(
         (event) => {
@@ -155,7 +151,7 @@ const App = ({ events, showInfo }) => {
                       ]
                 : newEvents;
             const newItems = newSelection.reduce((acc, event) => {
-                const eventDate = parse(event.date, 'dd-MM-yyyy', new Date());
+                const eventDate = parse(event.date, dateFormat, new Date());
                 const alreadyHas = acc.some(
                     (date) => date.getTime() === eventDate.getTime()
                 );
@@ -171,8 +167,8 @@ const App = ({ events, showInfo }) => {
     const onListHover = useCallback(
         (event, item) => {
             setHoverLocation(item.coordinates);
-            const date = parse(item.date, 'dd-MM-yyyy', new Date());
-            const duration = [new Date(date), add(new Date(date), { weeks: 1 })];
+            const date = parse(item.date, dateFormat, new Date());
+            const duration = [date, add(date, { weeks: 1 })];
             setHoverDuration(duration);
         },
         [setHoverLocation]
@@ -358,8 +354,6 @@ const App = ({ events, showInfo }) => {
         return 0;
     });
 
-    const filterWidths = ['80%', '60%', '40%'];
-
     return (
         <div className="App">
             <div
@@ -452,7 +446,6 @@ const App = ({ events, showInfo }) => {
                         date={currentDate}
                         lookAhead={lookAhead}
                         isActive={true}
-                        hoverDuration={hoverDuration}
                     />
                 </div>
 

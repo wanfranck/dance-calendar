@@ -1,7 +1,8 @@
 import { parse, add } from 'date-fns';
+import { dateFormat } from '../constants';
 
 export function isEventInDay(event, day) {
-    const date = parse(event.date, 'dd-MM-yyyy', new Date());
+    const date = parse(event.date, dateFormat, new Date());
     return date >= day && date < add(day, { hours: 24 });
 }
 
@@ -19,7 +20,7 @@ export function getEventsForSelection(events, selection) {
 
 export function getEventsAfter(events, day) {
     return events.filter((event) => {
-        const date = parse(event.date, 'dd-MM-yyyy', new Date());
+        const date = parse(event.date, dateFormat, new Date());
         return date >= day;
     });
 }

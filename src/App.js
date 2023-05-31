@@ -246,7 +246,7 @@ const App = ({ events, showInfo }) => {
                 border: isDayInEventDuration(date, hoverDuration)
                     ? '4px solid #025464'
                     : isCurrentDay(date)
-                    ? '2px solid #E57C23'
+                    ? '3px solid #E57C23'
                     : 'solid #d3d4d5 1px',
                 borderRadius: '4px',
             };

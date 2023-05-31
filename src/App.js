@@ -94,33 +94,36 @@ const App = ({ events, showInfo }) => {
         );
     }, [events, currentDate, chosenTags, lookAhead]);
 
-    const onCalendarSelection = useCallback((e, dates) => {
-        const isAdd = isMobile || e.ctrlKey || e.metaKey;
+    const onCalendarSelection = useCallback(
+        (e, dates) => {
+            const isAdd = isMobile || e.ctrlKey || e.metaKey;
 
-        const alreadySelectedDates = dates.filter((d) =>
-            selection.some((sd) => sd.getTime() === d.getTime())
-        );
-        const appearedDates = dates.filter((d) =>
-            selection.every((sd) => sd.getTime() !== d.getTime())
-        );
+            const alreadySelectedDates = dates.filter((d) =>
+                selection.some((sd) => sd.getTime() === d.getTime())
+            );
+            const appearedDates = dates.filter((d) =>
+                selection.every((sd) => sd.getTime() !== d.getTime())
+            );
 
-        const newSelection = isAdd
-            ? appearedDates.length
-                ? selection.concat(appearedDates)
-                : selection.filter(
-                      (d) =>
-                          !alreadySelectedDates.some(
-                              (sd) => sd.getTime() === d.getTime()
-                          )
-                  )
-            : dates;
-        const newItems = events.filter((event) =>
-            newSelection.some((day) => isEventInDay(event, day))
-        );
+            const newSelection = isAdd
+                ? appearedDates.length
+                    ? selection.concat(appearedDates)
+                    : selection.filter(
+                          (d) =>
+                              !alreadySelectedDates.some(
+                                  (sd) => sd.getTime() === d.getTime()
+                              )
+                      )
+                : dates;
+            const newItems = events.filter((event) =>
+                newSelection.some((day) => isEventInDay(event, day))
+            );
 
-        setDaysSelection(newSelection);
-        setSelectedEvents(newItems);
-    }, [isMobile, selection]);
+            setDaysSelection(newSelection);
+            setSelectedEvents(newItems);
+        },
+        [events, selection]
+    );
 
     const onMapSelection = useCallback(
         (event) => {
@@ -168,7 +171,8 @@ const App = ({ events, showInfo }) => {
         (event, item) => {
             setHoverLocation(item.coordinates);
             const date = parse(item.date, dateFormat, new Date());
-            const duration = [date, add(date, { weeks: 1 })];
+            const endDate = parse(item.endDate, dateFormat, new Date());
+            const duration = [date, endDate];
             setHoverDuration(duration);
         },
         [setHoverLocation]
@@ -208,7 +212,9 @@ const App = ({ events, showInfo }) => {
 
     const renderDay = useCallback(
         (date) => {
-            const dayEvents = filteredEvents.filter((ev) => isEventInDay(ev, date));
+            const dayEvents = filteredEvents.filter((ev) =>
+                isEventInDay(ev, date)
+            );
             const isSelected = selection.filter(
                 (selectedDate) => selectedDate.getTime() === date.getTime()
             ).length;
@@ -216,7 +222,10 @@ const App = ({ events, showInfo }) => {
             let cellColor = 'white';
             let fontColor = 'black';
 
-            if (isSelected || isDayInEventDuration(date, hoverDuration)) {
+            if (isDayInEventDuration(date, hoverDuration)) {
+                cellColor = '#f2d097';
+                fontColor = '#025464';
+            } else if (isSelected) {
                 cellColor = '#E8AA42';
                 fontColor = 'white';
             } else if (dayEvents.length) {
@@ -226,6 +235,7 @@ const App = ({ events, showInfo }) => {
 
             const dayStyle = {
                 display: 'flex',
+                position: 'relative',
                 flexDirection: 'column',
                 justifyContent: 'center',
                 textAlign: 'center',
@@ -233,18 +243,22 @@ const App = ({ events, showInfo }) => {
                 height: '100%',
                 color: fontColor,
                 backgroundColor: cellColor,
-                border: isCurrentDay(date)
+                border: isDayInEventDuration(date, hoverDuration)
+                    ? '4px solid #025464'
+                    : isCurrentDay(date)
                     ? '2px solid #E57C23'
                     : 'solid #d3d4d5 1px',
                 borderRadius: '4px',
             };
-    
+
             return (
                 <div style={dayStyle}>
-                    <div> {format(date, 'd')} </div>
+                    <div>{format(date, 'd')}</div>
                 </div>
             );
-        }, [filteredEvents, selection, hoverDuration]);
+        },
+        [filteredEvents, selection, hoverDuration]
+    );
 
     const renderHeader = (date, item, weekDayIdx) => {
         const weekdayInMonth = getCalendarDays(date).filter(

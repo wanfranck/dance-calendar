@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Routes, Route } from 'react-router-dom';
 
 import getEvents, { imageLink } from './Events/Events';
 import App from './App';
@@ -8,6 +9,7 @@ import { useLocalStorage } from './Utils/ReactUtils';
 import { AiOutlineClose } from 'react-icons/ai';
 import { IconContext } from 'react-icons';
 import { isMobile } from 'react-device-detect';
+import Form from './AddEvent';
 
 const examples = [
     {
@@ -137,7 +139,18 @@ function Root() {
                     </div>
                 </div>
             ) : null}
-            <App events={events} showInfo={() => setShowInfo(true)} />
+            <Routes>
+                <Route
+                    path="/"
+                    element={
+                        <App
+                            events={events}
+                            showInfo={() => setShowInfo(true)}
+                        />
+                    }
+                />
+                <Route path="add_event" element={<Form />} />
+            </Routes>
         </div>
     );
 }

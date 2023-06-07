@@ -21,8 +21,7 @@ import Battle from './../Icons/battle.png';
 import Lab from './../Icons/lab.png';
 import Unknown from './../Icons/unknown.png';
 
-mapboxgl.accessToken =
-    'pk.eyJ1IjoiYW50b24tbGFzaGNoYW5rYSIsImEiOiJjbGY1anhha3MwbGpoM3lxaGZmaHM4dWliIn0.JyEoFVACqTIpRpTZzSIFvg';
+mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
 function sourceFromEvents(events) {
     const features = events.map((event) => ({
@@ -48,7 +47,15 @@ const getImage = (prefix) => [
     `default-image${prefix}`,
 ];
 
-function Map({ events, location, isActive, onSelection, prefix, windowSize, hoverLocation }) {
+function Map({
+    events,
+    location,
+    isActive,
+    onSelection,
+    prefix,
+    windowSize,
+    hoverLocation,
+}) {
     const map = useRef(null);
     const hoverMarker = useRef(null);
     const [isLoaded, setLoaded] = useState(false);

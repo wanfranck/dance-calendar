@@ -3,8 +3,8 @@ import reader from 'g-sheets-api';
 import fallbackEvents from './FallbackEvents';
 
 const readerOptions = {
-    apiKey: 'AIzaSyBIfuDqf6o-AX1TE8NWixCvaDtqGq_0vX0',
-    sheetId: '1Wbf4smpI89PxlxTjrzxa_dPBwHMikIXkoL9gJKtIxYw',
+    apiKey: process.env.REACT_APP_G_SHEETS_API_KEY,
+    sheetId: process.env.REACT_APP_G_SHEETS_SHEET_ID,
     returnAllResults: true,
 };
 

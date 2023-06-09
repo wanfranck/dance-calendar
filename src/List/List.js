@@ -91,31 +91,25 @@ function List({ prefix, events, onItemClick, onHover }) {
         event.stopPropagation();
     };
 
-    const groupedEvents = events.reduce(
-        (acc, event) =>
-            event.isSelected
-                ? { ...acc, selected: [...acc.selected, event] }
-                : { ...acc, rest: [...acc.rest, event] },
-        { selected: [], rest: [] }
-    );
+    const listedEvents = events.some((e) => e.isSelected)
+        ? events.filter((e) => e.isSelected)
+        : events;
+    const items = listedEvents.map((item) => (
+        <ListItem
+            key={`list-item-${item.id}`}
+            isSelected={item.isSelected}
+            item={item}
+            onClick={(event, item) => onClickHandler(event, item)}
+            onHover={onHover}
+            isHighlighted={item.id === highlightedId}
+            toggleHighlighted={(_) =>
+                setHighlightedId(item.id === highlightedId ? null : item.id)
+            }
+        />
+    ));
 
-    const items = groupedEvents.selected
-        .concat(groupedEvents.rest)
-        .map((item) => (
-            <ListItem
-                key={`list-item-${item.id}`}
-                isSelected={item.isSelected}
-                item={item}
-                onClick={(event, item) => onClickHandler(event, item)}
-                onHover={onHover}
-                isHighlighted={item.id === highlightedId}
-                toggleHighlighted={(_) =>
-                    setHighlightedId(item.id === highlightedId ? null : item.id)
-                }
-            />
-        ));
     let rows = [];
-    const chunkSize = 2;
+    const chunkSize = isMobile ? 2 : 4;
     for (let i = 0; i < items.length; i += chunkSize) {
         const chunk = items.slice(i, i + chunkSize);
         rows.push(

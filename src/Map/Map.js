@@ -55,6 +55,8 @@ function Map({
     prefix,
     windowSize,
     hoverLocation,
+    onEnter,
+    onLeave,
 }) {
     const map = useRef(null);
     const hoverMarker = useRef(null);
@@ -100,6 +102,35 @@ function Map({
             map.current.off('click', ['events', 'selected-events'], listener);
         };
     }, [events, onSelection]);
+
+    useEffect(() => {
+        const enterListener = (event) => onEnter(event);
+        map.current.on(
+            'mouseenter',
+            ['events', 'selected-events'],
+            enterListener
+        );
+
+        const leaveListener = (event) => onLeave(event);
+        map.current.on(
+            'mouseleave',
+            ['events', 'selected-events'],
+            leaveListener
+        );
+
+        return () => {
+            map.current.off(
+                'mouseenter',
+                ['events', 'selected-events'],
+                enterListener
+            );
+            map.current.off(
+                'mouseleave',
+                ['events', 'selected-events'],
+                leaveListener
+            );
+        };
+    }, [events, onEnter, onLeave]);
 
     useEffect(() => {
         if (!isLoaded) return;

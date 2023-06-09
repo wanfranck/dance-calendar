@@ -477,7 +477,7 @@ const App = ({ events, showInfo }) => {
                             position: 'absolute',
                             top: '10px',
                             right: '10px',
-                            zIndex: '4',
+                            zIndex: '2',
                             padding: '0px',
                         }}
                         onClick={(_) => setIsListView(!isListView)}

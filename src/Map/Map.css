@@ -15,10 +15,7 @@
     font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
     padding: 10px;
     position: relative;
-    width: 20%;
-    min-width: 90px;
-    max-width: 100px;
-    left: 2%;
-    top: -98%;
+    left: 10px;
+    top: 10px;
     z-index: 1;
 }

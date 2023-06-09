@@ -2,6 +2,11 @@ import { useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { useEffect } from 'react';
 
+import { Button } from 'react-bootstrap';
+
+import { IoIosArrowUp } from 'react-icons/io';
+import { AiOutlineInfoCircle } from 'react-icons/ai';
+
 import 'mapbox-gl/src/css/mapbox-gl.css';
 import './Map.css';
 
@@ -47,6 +52,75 @@ const getImage = (prefix) => [
     `default-image${prefix}`,
 ];
 
+const legendItems = [
+    { title: 'camp', src: Class },
+    { title: 'battle', src: Battle },
+    { title: 'lab', src: Lab },
+    { title: 'other', src: Unknown },
+];
+
+function MapLegend({ items }) {
+    const [isOpened, setIsOpened] = useState(false);
+
+    const itemStyle = {
+        display: 'flex',
+        justifyContent: 'left',
+        gap: '20%',
+    };
+    const itemImageStyle = { width: '15px', height: '15px' };
+
+    const widthStyle = isOpened
+        ? { width: '20%', minWidth: '90px', maxWidth: '100px' }
+        : { height: '40px', width: '45px', padding: '0px' };
+
+    return (
+        <div className="legend" style={widthStyle}>
+            {!isOpened ? (
+                <Button
+                    variant="light"
+                    style={{
+                        height: '40px',
+                        width: '45px',
+                        padding: '0px',
+                    }}
+                    onClick={(_) => setIsOpened(true)}
+                >
+                    <AiOutlineInfoCircle width="100%" height="100%" />
+                </Button>
+            ) : (
+                <div>
+                    {items.map((item) => (
+                        <div style={itemStyle}>
+                            <div>
+                                <img
+                                    src={item.src}
+                                    alt={item.title}
+                                    style={itemImageStyle}
+                                />
+                            </div>
+                            <div>{item.title}</div>
+                        </div>
+                    ))}
+                    <Button
+                        variant="light"
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            width: '100%',
+                            height: '20px',
+                            padding: '0px',
+                            marginTop: '10px',
+                        }}
+                        onClick={(_) => setIsOpened(false)}
+                    >
+                        <IoIosArrowUp />
+                    </Button>
+                </div>
+            )}
+        </div>
+    );
+}
+
 function Map({
     events,
     location,
@@ -66,7 +140,7 @@ function Map({
         if (!isLoaded) return;
 
         map.current.resize();
-    }, [windowSize, isLoaded]);
+    }, [windowSize, isActive, isLoaded]);
 
     useEffect(() => {
         if (map.current) return;
@@ -203,80 +277,14 @@ function Map({
             style={{
                 width: '100%',
                 height: '100%',
-                border: 'solid #d3d4d5 1px',
-                borderRadius: '4px',
+                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
             }}
         >
+            <MapLegend items={legendItems} />
             <div
                 className={`Map ${isActive ? '' : 'Hidden'}`}
                 id={`map-${prefix}`}
             />
-            <div id="state-legend" className="legend">
-                <div
-                    style={{
-                        display: 'flex',
-                        justifyContent: 'left',
-                        gap: '20%',
-                    }}
-                >
-                    <div>
-                        <img
-                            src={Class}
-                            alt="camp"
-                            style={{ width: '15px', height: '15px' }}
-                        ></img>
-                    </div>
-                    <div>camp</div>
-                </div>
-                <div
-                    style={{
-                        display: 'flex',
-                        justifyContent: 'left',
-                        gap: '20%',
-                    }}
-                >
-                    <div>
-                        <img
-                            src={Battle}
-                            alt="battle"
-                            style={{ width: '15px', height: '15px' }}
-                        ></img>
-                    </div>
-                    <div>battle</div>
-                </div>
-                <div
-                    style={{
-                        display: 'flex',
-                        justifyContent: 'left',
-                        gap: '20%',
-                    }}
-                >
-                    <div>
-                        <img
-                            src={Lab}
-                            alt="lab"
-                            style={{ width: '15px', height: '15px' }}
-                        ></img>
-                    </div>
-                    <div>lab</div>
-                </div>
-                <div
-                    style={{
-                        display: 'flex',
-                        justifyContent: 'left',
-                        gap: '20%',
-                    }}
-                >
-                    <div>
-                        <img
-                            src={Unknown}
-                            alt="unknown"
-                            style={{ width: '15px', height: '15px' }}
-                        ></img>
-                    </div>
-                    <div>other</div>
-                </div>
-            </div>
         </div>
     );
 }

@@ -339,21 +339,17 @@ const App = ({ events, showInfo }) => {
         );
     };
 
-    const isSmall = size.width < 1150;
     const mapContainerStyle = {
+        position: 'absolute',
+        display: !isListView ? 'block' : 'none',
         width: '100%',
         height: '100%',
-        margin: isMobile || lookAhead < 3 ? '0 0 10px 0' : '1px 0 0 0',
-        position: 'absolute',
-        zIndex: !isListView ? '3' : '0',
     };
     const listContainerStyle = {
+        position: 'absolute',
+        display: isListView ? 'block' : 'none',
         width: '100%',
         height: '100%',
-        [isSmall ? 'marginTop' : 'marginLeft']: '1px',
-        marginBottom: lookAhead < 3 ? '10px' : '0',
-        position: 'absolute',
-        zIndex: isListView ? '3' : '0',
     };
     const upperSection = { width: '100%', height: '40%', marginBottom: '1px' };
     const lowerSection = {
@@ -479,8 +475,8 @@ const App = ({ events, showInfo }) => {
                             height: '40px',
                             width: '45px',
                             position: 'absolute',
-                            top: '5px',
-                            right: '5px',
+                            top: '10px',
+                            right: '10px',
                             zIndex: '4',
                             padding: '0px',
                         }}
@@ -500,7 +496,7 @@ const App = ({ events, showInfo }) => {
                             prefix={'main'}
                             events={mappedEvents}
                             onSelection={onMapSelection}
-                            isActive={true}
+                            isActive={!isListView}
                             windowSize={size}
                             location={currentLocation}
                             hoverLocation={hoverLocation}
@@ -530,7 +526,7 @@ const App = ({ events, showInfo }) => {
                             prefix={'main'}
                             events={mappedEvents}
                             onItemClick={(item) => window.open(item.link)}
-                            isActive={true}
+                            isActive={isListView}
                             onHover={onListHover}
                         />
                     </div>

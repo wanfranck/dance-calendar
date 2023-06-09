@@ -26,7 +26,7 @@ import { dateFormat, filterWidths } from './constants';
 
 import './App.css';
 
-const MAP_CHANGE_SELECTION = false;
+const MAP_CHANGE_SELECTION = true;
 
 const getTimeRangedEvents = (events, currentDate, lookAhead) => {
     const lastMonth = add(currentDate, { months: lookAhead });
@@ -373,83 +373,70 @@ const App = ({ events, showInfo }) => {
         return rhsSelected === lhsSelected ? 0 : lhsSelected ? -1 : 1;
     });
 
+    const navBarButtonStyle = {
+        height: '40px',
+        width: '45px',
+    };
+    const logoImageStyle = { height: '30px', width: '30px' };
+
     return (
         <div className="App">
-            <div
-                className="NavigationBar"
-                style={{
-                    gap: '2px',
-                    marginBottom: '4px',
-                    justifyContent: 'space-between',
-                }}
-            >
-                <div style={{ display: 'flex' }}>
-                    <div style={{ marginRight: '5px' }}>
-                        <FilterControl
-                            date={currentDate}
-                            tags={tagsFilter.map((tag) => ({
-                                value: tag,
-                                isActive: chosenTags.indexOf(tag) !== -1,
-                            }))}
-                            onChangeFilter={(tag) => onSetTagFilter(tag)}
-                            width={filterWidths[lookAhead - 1]}
+            <div className="NavigationBar">
+                <div
+                    style={{
+                        width: '80%',
+                        margin: 'auto',
+                        display: 'flex',
+                        gap: '5px',
+                    }}
+                >
+                    <Button
+                        variant="light"
+                        style={{ ...navBarButtonStyle, padding: '0px' }}
+                        onClick={(_) =>
+                            window.open(
+                                'https://www.instagram.com/_dance.calendar/'
+                            )
+                        }
+                    >
+                        <img
+                            src={logoImg}
+                            style={logoImageStyle}
+                            alt={'Application Logo'}
                         />
-                    </div>
-                    <div>
-                        <Button
-                            variant="light"
-                            style={{ height: '40px', width: '45px' }}
-                            onClick={(event) => onClearSelection(event)}
-                        >
-                            <AiOutlineClear width="100%" height="100%" />
-                        </Button>
-                    </div>
-                </div>
-                <div style={{ display: 'flex' }}>
-                    <div style={{ display: 'flex' }}>
-                        <Button
-                            variant="light"
-                            style={{ height: '40px', width: '45px' }}
-                            onClick={showInfo}
-                        >
-                            <AiOutlineInfoCircle width="100%" height="100%" />
-                        </Button>
-                    </div>
-                    <div style={{ marginLeft: '5px' }}>
-                        <Button
-                            variant="light"
-                            style={{ height: '40px', width: '45px' }}
-                            onClick={(_) =>
-                                window.open(
-                                    'https://forms.gle/8SHYRZjKF89iS3598'
-                                )
-                            }
-                        >
-                            <AiOutlineSend width="100%" height="100%" />
-                        </Button>
-                    </div>
-                    <div style={{ marginLeft: '5px' }}>
-                        <Button
-                            variant="light"
-                            style={{
-                                textAlign: 'center',
-                                height: '40px',
-                                width: '45px',
-                                padding: '0px',
-                            }}
-                            onClick={(_) =>
-                                window.open(
-                                    'https://www.instagram.com/_dance.calendar/'
-                                )
-                            }
-                        >
-                            <img
-                                src={logoImg}
-                                style={{ height: '30px', width: '30px' }}
-                                alt={'Application Logo'}
-                            />
-                        </Button>
-                    </div>
+                    </Button>
+                    <FilterControl
+                        date={currentDate}
+                        tags={tagsFilter.map((tag) => ({
+                            value: tag,
+                            isActive: chosenTags.indexOf(tag) !== -1,
+                        }))}
+                        onChangeFilter={(tag) => onSetTagFilter(tag)}
+                        width={filterWidths[lookAhead - 1]}
+                    />
+                    <Button
+                        variant="light"
+                        style={navBarButtonStyle}
+                        onClick={(event) => onClearSelection(event)}
+                    >
+                        <AiOutlineClear width="100%" height="100%" />
+                    </Button>
+                    <Button
+                        variant="light"
+                        style={navBarButtonStyle}
+                        onClick={showInfo}
+                    >
+                        <AiOutlineInfoCircle width="100%" height="100%" />
+                    </Button>
+                    <Button
+                        variant="light"
+                        style={navBarButtonStyle}
+                        onClick={(_) =>
+                            window.open('https://forms.gle/8SHYRZjKF89iS3598')
+                        }
+                    >
+                        <AiOutlineSend width="100%" height="100%" />
+                    </Button>
                 </div>
             </div>
 

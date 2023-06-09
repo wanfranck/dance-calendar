@@ -90,7 +90,7 @@ function MapLegend({ items }) {
             ) : (
                 <div>
                     {items.map((item) => (
-                        <div style={itemStyle}>
+                        <div key={`${item.title}-key`} style={itemStyle}>
                             <div>
                                 <img
                                     src={item.src}
@@ -277,6 +277,8 @@ function Map({
             style={{
                 width: '100%',
                 height: '100%',
+                display: 'block',
+                position: 'relative',
                 boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
             }}
         >

@@ -82,7 +82,7 @@ function ListItem({
     );
 }
 
-function List({ prefix, events, onItemClick, onHover }) {
+function List({ prefix, events, onItemClick, onHover, isActive }) {
     const [highlightedId, setHighlightedId] = useState(null);
 
     const onClickHandler = (event, item) => {
@@ -120,7 +120,10 @@ function List({ prefix, events, onItemClick, onHover }) {
     }
 
     return (
-        <div key={`list-${prefix}`} className={`List`}>
+        <div
+            key={`list-${prefix}`}
+            className={`List ${isActive ? '' : 'Hidden'}`}
+        >
             {rows}
         </div>
     );

@@ -5,7 +5,9 @@ import {
     AiOutlineClear,
     AiOutlineSend,
     AiOutlineInfoCircle,
+    AiOutlineUnorderedList,
 } from 'react-icons/ai';
+import { RiMapPinLine } from 'react-icons/ri';
 import { isMobile } from 'react-device-detect';
 
 import Calendar from './Calendar';
@@ -23,6 +25,8 @@ import logoImg from './Icons/logo.png';
 import { dateFormat, filterWidths } from './constants';
 
 import './App.css';
+
+const MAP_CHANGE_SELECTION = true;
 
 const getTimeRangedEvents = (events, currentDate, lookAhead) => {
     const lastMonth = add(currentDate, { months: lookAhead });
@@ -55,6 +59,8 @@ const App = ({ events, showInfo }) => {
     const [chosenTags, setChosenTags] = useState([]);
     const [hoverLocation, setHoverLocation] = useState(null);
     const [hoverDuration, setHoverDuration] = useState([]);
+
+    const [isListView, setIsListView] = useState(true);
 
     const countLookAhead = (size) => {
         if (size.width < 800) return 1;
@@ -96,7 +102,7 @@ const App = ({ events, showInfo }) => {
 
     const onCalendarSelection = useCallback(
         (e, dates) => {
-            const isAdd = isMobile || e.ctrlKey || e.metaKey;
+            const isAdd = true || isMobile || e.ctrlKey || e.metaKey;
 
             const alreadySelectedDates = dates.filter((d) =>
                 selection.some((sd) => sd.getTime() === d.getTime())
@@ -127,6 +133,10 @@ const App = ({ events, showInfo }) => {
 
     const onMapSelection = useCallback(
         (event) => {
+            if (!MAP_CHANGE_SELECTION) {
+                return;
+            }
+
             const { originalEvent, features } = event;
             const isAdd =
                 isMobile || originalEvent.ctrlKey || originalEvent.metaKey;
@@ -329,25 +339,24 @@ const App = ({ events, showInfo }) => {
         );
     };
 
-    const isSmall = size.width < 1150;
     const mapContainerStyle = {
-        width: isSmall ? '100%' : '60%',
-        height: isSmall ? '50%' : '100%',
-        margin: isMobile || lookAhead < 3 ? '0 0 10px 0' : '1px 0 0 0',
+        position: 'absolute',
+        display: !isListView ? 'block' : 'none',
+        width: '100%',
+        height: '100%',
     };
     const listContainerStyle = {
-        width: isSmall ? '100%' : '40%',
-        height: isSmall ? '50%' : '100%',
-        [isSmall ? 'marginTop' : 'marginLeft']: '1px',
-        marginBottom: lookAhead < 3 ? '10px' : '0',
+        position: 'absolute',
+        display: isListView ? 'block' : 'none',
+        width: '100%',
+        height: '100%',
     };
     const upperSection = { width: '100%', height: '40%', marginBottom: '1px' };
     const lowerSection = {
-        display: 'flex',
-        flexDirection: isSmall ? 'column' : 'row',
         width: '100%',
-        height: isSmall ? '100%' : '60%',
+        height: '60%',
         margin: '1px 0 0 0',
+        position: 'relative',
     };
 
     const isEventSelected = (event) => {
@@ -359,92 +368,75 @@ const App = ({ events, showInfo }) => {
         isSelected: isEventSelected(ev),
     }));
     mappedEvents.sort((lhs, rhs) => {
-        if (isEventSelected(lhs) && !isEventSelected(rhs)) {
-            return -1;
-        } else if (isEventSelected(rhs) && isEventSelected(lhs)) {
-            return 1;
-        }
-
-        return 0;
+        const lhsSelected = isEventSelected(lhs);
+        const rhsSelected = isEventSelected(rhs);
+        return rhsSelected === lhsSelected ? 0 : lhsSelected ? -1 : 1;
     });
+
+    const navBarButtonStyle = {
+        height: '40px',
+        width: '45px',
+    };
+    const logoImageStyle = { height: '30px', width: '30px' };
 
     return (
         <div className="App">
-            <div
-                className="NavigationBar"
-                style={{
-                    gap: '2px',
-                    marginBottom: '4px',
-                    justifyContent: 'space-between',
-                }}
-            >
-                <div style={{ display: 'flex' }}>
-                    <div style={{ marginRight: '5px' }}>
-                        <FilterControl
-                            date={currentDate}
-                            tags={tagsFilter.map((tag) => ({
-                                value: tag,
-                                isActive: chosenTags.indexOf(tag) !== -1,
-                            }))}
-                            onChangeFilter={(tag) => onSetTagFilter(tag)}
-                            width={filterWidths[lookAhead - 1]}
+            <div className="NavigationBar">
+                <div
+                    style={{
+                        width: '80%',
+                        margin: 'auto',
+                        display: 'flex',
+                        gap: '5px',
+                    }}
+                >
+                    <Button
+                        variant="light"
+                        style={{ ...navBarButtonStyle, padding: '0px' }}
+                        onClick={(_) =>
+                            window.open(
+                                'https://www.instagram.com/_dance.calendar/'
+                            )
+                        }
+                    >
+                        <img
+                            src={logoImg}
+                            style={logoImageStyle}
+                            alt={'Application Logo'}
                         />
-                    </div>
-                    <div>
-                        <Button
-                            variant="light"
-                            style={{ height: '40px', width: '45px' }}
-                            onClick={(event) => onClearSelection(event)}
-                        >
-                            <AiOutlineClear width="100%" height="100%" />
-                        </Button>
-                    </div>
-                </div>
-                <div style={{ display: 'flex' }}>
-                    <div style={{ display: 'flex' }}>
-                        <Button
-                            variant="light"
-                            style={{ height: '40px', width: '45px' }}
-                            onClick={showInfo}
-                        >
-                            <AiOutlineInfoCircle width="100%" height="100%" />
-                        </Button>
-                    </div>
-                    <div style={{ marginLeft: '5px' }}>
-                        <Button
-                            variant="light"
-                            style={{ height: '40px', width: '45px' }}
-                            onClick={(_) =>
-                                window.open(
-                                    'https://forms.gle/8SHYRZjKF89iS3598'
-                                )
-                            }
-                        >
-                            <AiOutlineSend width="100%" height="100%" />
-                        </Button>
-                    </div>
-                    <div style={{ marginLeft: '5px' }}>
-                        <Button
-                            variant="light"
-                            style={{
-                                textAlign: 'center',
-                                height: '40px',
-                                width: '45px',
-                                padding: '0px',
-                            }}
-                            onClick={(_) =>
-                                window.open(
-                                    'https://www.instagram.com/_dance.calendar/'
-                                )
-                            }
-                        >
-                            <img
-                                src={logoImg}
-                                style={{ height: '30px', width: '30px' }}
-                                alt={'Application Logo'}
-                            />
-                        </Button>
-                    </div>
+                    </Button>
+                    <FilterControl
+                        date={currentDate}
+                        tags={tagsFilter.map((tag) => ({
+                            value: tag,
+                            isActive: chosenTags.indexOf(tag) !== -1,
+                        }))}
+                        onChangeFilter={(tag) => onSetTagFilter(tag)}
+                        width={filterWidths[lookAhead - 1]}
+                    />
+                    <Button
+                        variant="light"
+                        style={navBarButtonStyle}
+                        onClick={(event) => onClearSelection(event)}
+                    >
+                        <AiOutlineClear width="100%" height="100%" />
+                    </Button>
+                    <Button
+                        variant="light"
+                        style={navBarButtonStyle}
+                        onClick={showInfo}
+                    >
+                        <AiOutlineInfoCircle width="100%" height="100%" />
+                    </Button>
+                    <Button
+                        variant="light"
+                        style={navBarButtonStyle}
+                        onClick={(_) =>
+                            window.open('https://forms.gle/8SHYRZjKF89iS3598')
+                        }
+                    >
+                        <AiOutlineSend width="100%" height="100%" />
+                    </Button>
                 </div>
             </div>
 
@@ -464,15 +456,56 @@ const App = ({ events, showInfo }) => {
                 </div>
 
                 <div style={lowerSection}>
+                    <Button
+                        variant="light"
+                        style={{
+                            height: '40px',
+                            width: '45px',
+                            position: 'absolute',
+                            top: '10px',
+                            right: '10px',
+                            zIndex: '2',
+                            padding: '0px',
+                        }}
+                        onClick={(_) => setIsListView(!isListView)}
+                    >
+                        {isListView ? (
+                            <RiMapPinLine width="100%" height="100%" />
+                        ) : (
+                            <AiOutlineUnorderedList
+                                width="100%"
+                                height="100%"
+                            />
+                        )}
+                    </Button>
                     <div style={mapContainerStyle}>
                         <Map
                             prefix={'main'}
                             events={mappedEvents}
                             onSelection={onMapSelection}
-                            isActive={true}
+                            isActive={!isListView}
                             windowSize={size}
                             location={currentLocation}
                             hoverLocation={hoverLocation}
+                            onEnter={(event) => {
+                                const { features } = event;
+                                const item = features[0].properties;
+                                const date = parse(
+                                    item.date,
+                                    dateFormat,
+                                    new Date()
+                                );
+                                const endDate = parse(
+                                    item.endDate,
+                                    dateFormat,
+                                    new Date()
+                                );
+                                const duration = [date, endDate];
+                                setHoverDuration(duration);
+                            }}
+                            onLeave={(e) => {
+                                setHoverDuration([]);
+                            }}
                         />
                     </div>
                     <div style={listContainerStyle}>
@@ -480,7 +513,7 @@ const App = ({ events, showInfo }) => {
                             prefix={'main'}
                             events={mappedEvents}
                             onItemClick={(item) => window.open(item.link)}
-                            isActive={true}
+                            isActive={isListView}
                             onHover={onListHover}
                         />
                     </div>

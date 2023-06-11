@@ -60,31 +60,38 @@ function Calendar({
             />
         ));
 
-    const buttonStyle = {
+    const buttonDivStyle = {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        height: '96%',
+        height: '100%',
     };
 
     return (
         <div style={{ width: '100%', height: '100%' }}>
-            <BrowserView className={`Calendar ${isActive ? '' : 'Hidden'}`}>
-                <Button
-                    variant="light"
-                    style={{ ...buttonStyle, margin: '2px 3px 2px 0' }}
-                    onClick={() => onSetDate(sub(date, { months: 1 }))}
-                >
-                    <AiOutlineLeft width="100%" />
-                </Button>
+            <BrowserView
+                className={`Calendar ${isActive ? '' : 'Hidden'}`}
+                style={{ gap: '20px' }}
+            >
+                <div style={{ ...buttonDivStyle }}>
+                    <Button
+                        variant="light"
+                        style={{ height: '76%' }}
+                        onClick={() => onSetDate(sub(date, { months: 1 }))}
+                    >
+                        <AiOutlineLeft width="100%" />
+                    </Button>
+                </div>
                 {months}
-                <Button
-                    variant="light"
-                    style={{ ...buttonStyle, margin: '2px 0 2px 3px' }}
-                    onClick={() => onSetDate(add(date, { months: 1 }))}
-                >
-                    <AiOutlineRight width="100%" />
-                </Button>
+                <div style={{ ...buttonDivStyle }}>
+                    <Button
+                        variant="light"
+                        style={{ height: '76%' }}
+                        onClick={() => onSetDate(add(date, { months: 1 }))}
+                    >
+                        <AiOutlineRight width="100%" />
+                    </Button>
+                </div>
             </BrowserView>
             <MobileView
                 className={`Calendar ${isActive ? '' : 'Hidden'}`}
